@@ -10,23 +10,15 @@ return new class extends Migration {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
 
-            // links
-            $table->foreignId('job_id')->constrained('jobs')->cascadeOnDelete();
-            // seeker is a user with role=seeker (enforced by app logic)
+            $table->foreignId('job_id')->constrained('job_posts')->cascadeOnDelete();
             $table->foreignId('seeker_id')->constrained('users')->cascadeOnDelete();
 
-            // application content
             $table->text('cover_letter')->nullable();
-
-            // workflow status
             $table->enum('status', ['pending','accepted','rejected'])->default('pending');
 
             $table->timestamps();
 
-            // one application per seeker per job
             $table->unique(['job_id','seeker_id']);
-
-            // helpful indexes
             $table->index('status');
         });
     }
