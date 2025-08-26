@@ -10,25 +10,19 @@ return new class extends Migration {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
 
-            // review relates to a job that happened
-            $table->foreignId('job_id')->constrained('jobs')->cascadeOnDelete();
-
-            // who reviewed whom
+            $table->foreignId('job_id')->constrained('job_posts')->cascadeOnDelete();
             $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('reviewee_id')->constrained('users')->cascadeOnDelete();
 
-            // content
-            $table->unsignedTinyInteger('rating'); // 1..5 (enforce range in validation)
+            $table->unsignedTinyInteger('rating');
             $table->text('feedback')->nullable();
 
             $table->timestamps();
 
-            // helpful queries: find reviews for a user, or by job
             $table->index('reviewee_id');
             $table->index('job_id');
 
-            // optional: prevent duplicate review from same reviewer for same job
-            $table->unique(['job_id', 'reviewer_id']);
+            $table->unique(['job_id', 'reviewer_id']); // one review per job per reviewer
         });
     }
 
