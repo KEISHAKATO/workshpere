@@ -45,4 +45,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public const ROLE_SEEKER   = 'seeker';
+    public const ROLE_EMPLOYER = 'employer';
+    public const ROLE_ADMIN    = 'admin';
+
+    protected $attributes = [
+        'role' => self::ROLE_SEEKER,
+    ];
+
+    public function isSeeker(): bool   { return $this->role === self::ROLE_SEEKER; }
+    public function isEmployer(): bool { return $this->role === self::ROLE_EMPLOYER; }
+    public function isAdmin(): bool    { return $this->role === self::ROLE_ADMIN; }
 }
