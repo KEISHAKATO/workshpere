@@ -24,18 +24,31 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $data = $request->validate([
+            'bio'              => ['nullable','string','max:2000'],
+            'skills'           => ['nullable','string'], // CSV string from the form
+            'experience_years' => ['nullable','integer','min:0','max:60'],
+            'location_city'    => ['nullable','string','max:120'],
+            'location_county'  => ['nullable','string','max:120'],
+            'lat'              => ['nullable','numeric'],
+            'lng'              => ['nullable','numeric'],
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        // Convert CSV -> array (and clean it up)
+        $skillsCsv = $data['skills'] ?? '';
+        $skillsArr = array_values(array_filter(array_map(
+            fn($s) => trim($s),
+            $skillsCsv === '' ? [] : preg_split('/,|;|\|/u', $skillsCsv)
+        )));
+        $data['skills'] = $skillsArr;
 
-        $request->user()->save();
+        $request->user()->profile()->updateOrCreate([], $data);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return back()->with('status', 'Profile saved.');
     }
+
 
     /**
      * Delete the user's account.

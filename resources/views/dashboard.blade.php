@@ -4,22 +4,19 @@
         $user = auth()->user();
     @endphp
 
-    {{-- Header slot (role-aware title + subtitle) --}}
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Dashboard') }} - {{ ucfirst($user->role) }}
-                </h2>
-                <p class="text-sm text-gray-600 mt-1">
-                    @switch($user->role)
-                        @case('seeker')  Find and apply for jobs that match your skills. @break
-                        @case('employer') Post jobs and manage applicants in one place. @break
-                        @case('admin')    Monitor activity and manage the platform. @break
-                        @default          Welcome back!
-                    @endswitch
-                </p>
-            </div>
+        <div>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Dashboard – {{ ucfirst($user->role) }}
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">
+                @switch($user->role)
+                    @case('seeker')  Find and apply for jobs that match your skills. @break
+                    @case('employer') Post jobs and manage applicants in one place. @break
+                    @case('admin')    Monitor activity and manage the platform. @break
+                    @default          Welcome back!
+                @endswitch
+            </p>
         </div>
     </x-slot>
 
@@ -29,7 +26,6 @@
             {{-- Seeker section --}}
             @if($user->isSeeker() || $user->isAdmin())
                 @php
-                    // Basic numbers (safe, small queries). For heavy data, move to a controller later.
                     $myApplications = \App\Models\Application::where('seeker_id', $user->id)->count();
                     $pendingApps    = \App\Models\Application::where('seeker_id', $user->id)->where('status','pending')->count();
                     $openJobs       = \App\Models\Job::where('status','open')->count();
@@ -55,7 +51,7 @@
 
                     <div class="mt-5 flex gap-3">
                         <a href="{{ route('seeker.jobs.index') }}" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Browse Jobs</a>
-                        {{-- Optional: link to "My applications" page when you add it --}}
+                        <a href="{{ route('seeker.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Profile</a>
                     </div>
                 </section>
             @endif
@@ -90,6 +86,7 @@
                     <div class="mt-5 flex gap-3">
                         <a href="{{ route('employer.job_posts.create') }}" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Post a Job</a>
                         <a href="{{ route('employer.job_posts.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Job Posts</a>
+                        <a href="{{ route('employer.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Company Profile</a>
                     </div>
                 </section>
             @endif

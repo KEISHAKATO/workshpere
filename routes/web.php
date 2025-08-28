@@ -1,22 +1,27 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 
 // Employer controllers
 use App\Http\Controllers\Employer\JobPostController;
 use App\Http\Controllers\Employer\ApplicationReviewController;
+use App\Http\Controllers\Employer\ProfileController as EmployerProfileController;
 
 // Seeker controllers
 use App\Http\Controllers\Seeker\BrowseJobsController;
 use App\Http\Controllers\Seeker\ApplyController;
+use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 
 // Messaging
 use App\Http\Controllers\MessageController;
 
 // Admin
 use App\Http\Controllers\Admin\UsersController;
+
+
+// Public / Auth basics
+
 
 // Welcome page
 Route::get('/', function () {
@@ -28,14 +33,20 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Profile (all authenticated users)
+// Redirect generic /profile to role-specific editor
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', function () {
+        $u = auth()->user();
+        if (method_exists($u, 'isEmployer') && ($u->isEmployer() || $u->isAdmin())) {
+            return redirect()->route('employer.profile.edit');
+        }
+        return redirect()->route('seeker.profile.edit');
+    })->name('profile'); // keeps a familiar name if you link to "Account Settings"
 });
 
-// Must be logged in first
+
+// Authenticated areas
+
 Route::middleware(['auth'])->group(function () {
 
 
@@ -44,6 +55,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware([RoleMiddleware::class . ':employer,admin'])
         ->prefix('employer')->name('employer.')
         ->group(function () {
+            // Profile
+            Route::get('profile', [EmployerProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch('profile', [EmployerProfileController::class, 'update'])->name('profile.update');
+
+            // Job posts CRUD
             Route::get('job-posts', [JobPostController::class, 'index'])->name('job_posts.index');
             Route::get('job-posts/create', [JobPostController::class, 'create'])->name('job_posts.create');
             Route::post('job-posts', [JobPostController::class, 'store'])->name('job_posts.store');
@@ -52,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('job-posts/{job}', [JobPostController::class, 'update'])->name('job_posts.update');
             Route::delete('job-posts/{job}', [JobPostController::class, 'destroy'])->name('job_posts.destroy');
 
-            // Applications for a job
+            // Applications management
             Route::get('job-posts/{job}/applications', [ApplicationReviewController::class, 'index'])->name('applications.index');
             Route::put('applications/{application}/status', [ApplicationReviewController::class, 'updateStatus'])->name('applications.updateStatus');
         });
@@ -63,13 +79,18 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware([RoleMiddleware::class . ':seeker,admin'])
         ->prefix('seeker')->name('seeker.')
         ->group(function () {
+            // Profile
+            Route::get('profile', [SeekerProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch('profile', [SeekerProfileController::class, 'update'])->name('profile.update');
+
+            // Browse/apply jobs
             Route::get('jobs', [BrowseJobsController::class, 'index'])->name('jobs.index');
             Route::get('jobs/{job}', [BrowseJobsController::class, 'show'])->name('jobs.show');
             Route::post('jobs/{job}/apply', [ApplyController::class, 'store'])->name('apply.store');
         });
 
 
-    // Messaging (both employer & seeker involved)
+    // Messaging (both roles)
 
     Route::post('jobs/{job}/messages', [MessageController::class, 'store'])->name('messages.store');
 

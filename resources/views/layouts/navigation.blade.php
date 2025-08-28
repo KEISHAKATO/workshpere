@@ -2,14 +2,14 @@
 <nav class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
-            {{-- Left: brand --}}
+            {{-- Left: brand + main links --}}
             <div class="flex items-center gap-6">
                 <a href="{{ url('/') }}" class="text-lg font-semibold">
                     WORKSPHERE
                 </a>
 
                 @auth
-                    {{-- Common links for any logged-in user --}}
+                    {{-- Common link --}}
                     <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">
                         Dashboard
                     </a>
@@ -18,6 +18,9 @@
                     @if(auth()->user()->isSeeker() || auth()->user()->isAdmin())
                         <a href="{{ route('seeker.jobs.index') }}" class="text-gray-700 hover:text-gray-900">
                             Browse Jobs
+                        </a>
+                        <a href="{{ route('seeker.profile.edit') }}" class="text-gray-700 hover:text-gray-900">
+                            My Profile
                         </a>
                     @endif
 
@@ -28,6 +31,9 @@
                         </a>
                         <a href="{{ route('employer.job_posts.create') }}" class="text-gray-700 hover:text-gray-900">
                             Post a Job
+                        </a>
+                        <a href="{{ route('employer.profile.edit') }}" class="text-gray-700 hover:text-gray-900">
+                            Company Profile
                         </a>
                     @endif
 
@@ -51,8 +57,6 @@
                     <span class="hidden sm:inline text-sm text-gray-600">
                         {{ auth()->user()->name }} • {{ ucfirst(auth()->user()->role) }}
                     </span>
-
-                    <a href="{{ route('profile.edit') }}" class="text-gray-700 hover:text-gray-900">Profile</a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

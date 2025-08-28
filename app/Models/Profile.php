@@ -2,17 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model
 {
-    // OK for seeding/internal use; controllers must validate inputs.
-    protected $guarded = [];
+    use HasFactory;
+
+    protected $fillable = [
+        // shared
+        'bio',
+        'about',
+        'skills',
+        'experience_years',
+        'preferred_job_type',
+        'availability',
+        'location_city',
+        'location_county',
+        'lat',
+        'lng',
+
+        // employer
+        'company_name',
+        'website',
+    ];
 
     protected $casts = [
         'skills' => 'array',
-        'lat' => 'float',
-        'lng' => 'float',
+        'lat'    => 'decimal:7',
+        'lng'    => 'decimal:7',
     ];
 
     public function user()

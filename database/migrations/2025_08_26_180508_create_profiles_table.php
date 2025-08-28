@@ -10,22 +10,22 @@ return new class extends Migration {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
 
-            // link to users table (1:1)
+            // 1:1 with users
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
 
-            // seeker fields
-            $table->text('bio')->nullable();
-            // store skills as JSON array of strings: ["carpentry","welding"]
-            $table->json('skills')->nullable();
+            // Seeker fields
+            $table->string('bio', 160)->nullable();      // short one-liner
+            $table->text('about')->nullable();           // longer paragraph
+            $table->json('skills')->nullable();          // ["carpentry","welding"]
             $table->unsignedTinyInteger('experience_years')->default(0);
-            $table->string('preferred_job_type', 30)->nullable(); // e.g. full_time, part_time, gig, contract
-            $table->string('availability', 30)->nullable();        // e.g. immediate, 1_week, flexible
+            $table->string('preferred_job_type', 30)->nullable(); // full_time/part_time/gig/contract
+            $table->string('availability', 30)->nullable();        // immediate/1_week/flexible
 
-            // employer fields (optional for seekers)
+            // Employer fields (optional for seekers)
             $table->string('company_name', 160)->nullable();
             $table->string('website', 191)->nullable();
 
-            // location
+            // Location (both roles)
             $table->string('location_city', 120)->nullable();
             $table->string('location_county', 120)->nullable();
             $table->decimal('lat', 10, 7)->nullable();
@@ -33,7 +33,6 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            // helpful indexes
             $table->index('location_county');
         });
     }
