@@ -8,29 +8,47 @@ use Illuminate\Http\Request;
 
 class BrowseJobsController extends Controller
 {
+    // logged-in seeker browse
     public function index(Request $request)
     {
-        $q = Job::query()->where('status','open');
+        $query = Job::query()->where('status','open');
 
-        if ($s = $request->get('q')) {
-            $q->where(function($qq) use ($s) {
-                $qq->where('title','like',"%$s%")
-                   ->orWhere('description','like',"%$s%")
-                   ->orWhere('category','like',"%$s%");
+        if ($search = $request->string('q')->toString()) {
+            $query->where(function($q) use ($search) {
+                $q->where('title','like',"%$search%")
+                  ->orWhere('description','like',"%$search%")
+                  ->orWhere('category','like',"%$search%");
             });
         }
 
-        if ($county = $request->get('county')) $q->where('location_county',$county);
-        if ($type = $request->get('type'))     $q->where('job_type',$type);
+        if ($county = $request->string('county')->toString()) {
+            $query->where('location_county', $county);
+        }
 
-        $jobs = $q->latest('posted_at')->paginate(12)->withQueryString();
+        if ($skills = $request->string('skills')->toString()) {
+            // comma-separated -> look for any of them in required_skills JSON
+            $tags = collect(explode(',', $skills))->map(fn($s)=>trim($s))->filter()->all();
+            foreach ($tags as $tag) {
+                $query->whereJsonContains('required_skills', $tag);
+            }
+        }
+
+        $jobs = $query->latest('created_at')->paginate(10)->withQueryString();
 
         return view('seeker.jobs.index', compact('jobs'));
     }
 
+    // logged-in seeker detail
     public function show(Job $job)
     {
         abort_if($job->status !== 'open', 404);
         return view('seeker.jobs.show', compact('job'));
+    }
+
+    // public job detail (no auth)
+    public function publicShow(Job $job)
+    {
+        abort_if($job->status !== 'open', 404);
+        return view('public.jobs.show', compact('job'));
     }
 }

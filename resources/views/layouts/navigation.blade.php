@@ -8,6 +8,11 @@
                     WORKSPHERE
                 </a>
 
+                <a href="{{ route('public.jobs.index') }}" class="text-gray-700 hover:text-gray-900">
+                    Jobs
+                </a>
+
+
                 @auth
                     {{-- Common link --}}
                     <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">
@@ -21,6 +26,9 @@
                         </a>
                         <a href="{{ route('seeker.profile.edit') }}" class="text-gray-700 hover:text-gray-900">
                             My Profile
+                        </a>
+                        <a href="{{ route('seeker.applications.index') }}" class="text-gray-700 hover:text-gray-900">
+                            My Applications
                         </a>
                     @endif
 

@@ -9,21 +9,40 @@ use Illuminate\Http\Request;
 
 class ApplicationReviewController extends Controller
 {
-    public function index(Job $job)
+    // GET /employer/job-posts/{job}/applications
+    public function index(Request $request, Job $job)
     {
-        abort_unless($job->employer_id === auth()->id(), 403);
-        $applications = $job->applications()->with('seeker.profile')->latest()->paginate(15);
-        return view('employer.job_posts.applications', compact('job','applications'));
+        $user = $request->user();
+
+        // Only the owning employer (or admin) can view
+        if (!($user->isAdmin() || $job->employer_id === $user->id)) {
+            abort(403);
+        }
+
+        $applications = Application::with(['seeker.profile'])
+            ->where('job_id', $job->id)
+            ->latest()
+            ->paginate(15);
+
+        return view('employer.applications.index', compact('job', 'applications'));
     }
 
+    // PUT /employer/applications/{application}/status
     public function updateStatus(Request $request, Application $application)
     {
-        $request->validate(['status' => 'required|in:pending,accepted,rejected']);
-        $job = $application->job;
-        abort_unless($job && $job->employer_id === auth()->id(), 403);
+        $user = $request->user();
 
-        $application->update(['status' => $request->status]);
+        // Ensure the application belongs to a job owned by this employer (or admin)
+        if (!($user->isAdmin() || $application->job->employer_id === $user->id)) {
+            abort(403);
+        }
 
-        return back()->with('ok', 'Status updated to '.$request->status);
+        $data = $request->validate([
+            'status' => ['required', 'in:pending,accepted,rejected'],
+        ]);
+
+        $application->update(['status' => $data['status']]);
+
+        return back()->with('ok', 'Application status updated.');
     }
 }

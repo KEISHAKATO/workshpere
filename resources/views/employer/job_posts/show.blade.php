@@ -1,34 +1,67 @@
 <x-app-layout>
-    <div class="max-w-5xl mx-auto p-6 space-y-4">
-        @if(session('ok')) <div class="p-2 bg-green-100">{{ session('ok') }}</div> @endif
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl">{{ $job->title }}</h2>
 
-        <div class="border p-4 rounded">
-            <h1 class="text-2xl font-semibold">{{ $job->title }}</h1>
-            <div class="text-sm text-gray-600">{{ $job->location_city }}, {{ $job->location_county }} • {{ $job->job_type }} • {{ $job->status }}</div>
-            <p class="mt-3">{{ $job->description }}</p>
-            <div class="mt-2 text-sm">Skills: {{ implode(', ', (array)$job->required_skills) }}</div>
-            <div class="mt-4 flex gap-3">
-                <a href="{{ route('employer.job_posts.edit',$job) }}" class="text-blue-600 underline">Edit</a>
-                <form method="post" action="{{ route('employer.job_posts.destroy',$job) }}">
-                    @csrf @method('DELETE')
-                    <button class="text-red-600 underline">Delete</button>
-                </form>
+            <div class="flex items-center gap-2">
+                <a class="px-3 py-2 bg-gray-100 rounded"
+                   href="{{ route('employer.job_posts.edit', $job) }}">Edit</a>
+
+                <a class="px-3 py-2 bg-gray-100 rounded"
+                   href="{{ route('public.jobs.show', $job) }}">View public</a>
+
+                <a class="px-3 py-2 bg-blue-600 text-white rounded"
+                   href="{{ route('employer.applications.index', $job) }}">Applications</a>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow space-y-4">
+        @if(session('status'))
+            <div class="p-2 bg-green-50 text-green-700 rounded">{{ session('status') }}</div>
+        @endif
+
+        {{-- Meta --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div><strong>Type:</strong> {{ ucfirst(str_replace('_',' ', $job->job_type)) }}</div>
+            <div><strong>Status:</strong> {{ ucfirst($job->status) }}</div>
+            <div><strong>City:</strong> {{ $job->location_city ?? '—' }}</div>
+            <div><strong>County:</strong> {{ $job->location_county ?? '—' }}</div>
+            <div class="sm:col-span-2">
+                <strong>Pay:</strong>
+                {{ $job->currency ?? 'KES' }}
+                {{ $job->pay_min ? number_format($job->pay_min) : '—' }}
+                –
+                {{ $job->pay_max ? number_format($job->pay_max) : '—' }}
+            </div>
+            <div class="sm:col-span-2">
+                <strong>Posted:</strong> {{ optional($job->posted_at)->toDayDateTimeString() ?? '—' }}
             </div>
         </div>
 
-        <div class="border p-4 rounded">
-            <h2 class="text-xl font-semibold mb-2">Applications</h2>
-            <a class="text-blue-600 underline" href="{{ route('employer.applications.index',$job) }}">View applicants</a>
+        {{-- Required skills --}}
+        @if(is_array($job->required_skills) && count($job->required_skills))
+            <div class="text-sm">
+                <strong>Required skills:</strong>
+                <div class="mt-1">
+                    @foreach($job->required_skills as $s)
+                        <span class="inline-block px-2 py-1 bg-gray-100 rounded mr-1 mt-1">{{ $s }}</span>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        {{-- Description --}}
+        <div class="prose max-w-none">
+            <h3 class="font-semibold text-lg mt-2">Description</h3>
+            <p class="text-gray-700 whitespace-pre-line">{{ $job->description }}</p>
         </div>
 
-        <div class="border p-4 rounded">
-            <h2 class="text-xl font-semibold mb-2">Message an applicant</h2>
-            <form method="post" action="{{ route('messages.store',$job) }}" class="space-y-2">
-                @csrf
-                <input name="receiver_id" class="border p-2 w-full" placeholder="Receiver user ID">
-                <textarea name="content" class="border p-2 w-full" placeholder="Write a message"></textarea>
-                <button class="bg-blue-600 text-white px-3 py-1 rounded">Send</button>
-            </form>
+        {{-- Footer actions --}}
+        <div class="pt-4 border-t flex items-center gap-3">
+            <a href="{{ route('public.jobs.show', $job) }}" class="text-blue-700 underline">View public page</a>
+            <span class="text-gray-300">|</span>
+            <a href="{{ route('employer.applications.index', $job) }}" class="text-blue-700 underline">View applications</a>
         </div>
     </div>
 </x-app-layout>

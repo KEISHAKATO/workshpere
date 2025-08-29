@@ -21,8 +21,12 @@ use App\Http\Controllers\Admin\UsersController;
 
 
 // Public / Auth basics
+use App\Http\Controllers\PublicJobsController;
 
 
+// PUBLIC job detail (no login required)
+Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.index');
+Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
 // Welcome page
 Route::get('/', function () {
     return view('welcome');
@@ -87,7 +91,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('jobs', [BrowseJobsController::class, 'index'])->name('jobs.index');
             Route::get('jobs/{job}', [BrowseJobsController::class, 'show'])->name('jobs.show');
             Route::post('jobs/{job}/apply', [ApplyController::class, 'store'])->name('apply.store');
-        });
+
+            // My Applications
+            Route::get('applications', [\App\Http\Controllers\Seeker\MyApplicationsController::class, 'index'])
+                ->name('applications.index');
+
+            Route::delete('applications/{application}', [\App\Http\Controllers\Seeker\MyApplicationsController::class, 'destroy'])
+                ->name('applications.destroy');
+
+                    });
 
 
     // Messaging (both roles)

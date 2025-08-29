@@ -11,18 +11,26 @@ class ApplyController extends Controller
 {
     public function store(Request $request, Job $job)
     {
+        // job must be open
         abort_if($job->status !== 'open', 404);
 
         $data = $request->validate([
             'cover_letter' => 'nullable|string|max:5000',
         ]);
 
-        // unique job_id + seeker_id guaranteed by DB
+        $user = $request->user();
+
+        // only seekers/admins can apply
+        if (!($user->isSeeker() || $user->isAdmin())) {
+            abort(403);
+        }
+
+        // prevent duplicates
         Application::firstOrCreate(
-            ['job_id' => $job->id, 'seeker_id' => auth()->id()],
+            ['job_id' => $job->id, 'seeker_id' => $user->id],
             ['cover_letter' => $data['cover_letter'] ?? null, 'status' => 'pending']
         );
 
-        return back()->with('ok', 'Application sent.');
+        return back()->with('status', 'Application submitted.');
     }
 }
