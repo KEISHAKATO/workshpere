@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Applications management
             Route::get('job-posts/{job}/applications', [ApplicationReviewController::class, 'index'])->name('applications.index');
+            Route::get('applications/{application}', [ApplicationReviewController::class, 'show'])->name('applications.show');
             Route::put('applications/{application}/status', [ApplicationReviewController::class, 'updateStatus'])->name('applications.updateStatus');
         });
 

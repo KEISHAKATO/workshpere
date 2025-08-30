@@ -45,4 +45,21 @@ class ApplicationReviewController extends Controller
 
         return back()->with('ok', 'Application status updated.');
     }
+    public function show(\App\Models\Application $application)
+    {
+        // Security: only the employer who owns the job can view
+        abort_unless($application->job && $application->job->employer_id === auth()->id(), 403);
+
+        // Eager load seeker + profile + job for the view
+        $application->load([
+            'job',
+            'seeker.profile',
+        ]);
+
+        $seeker = $application->seeker;
+        $profile = $seeker?->profile;
+
+        return view('employer.applications.show', compact('application', 'seeker', 'profile'));
+    }
+
 }
