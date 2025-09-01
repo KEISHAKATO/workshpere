@@ -8,9 +8,6 @@ class Job extends Model
 {
     protected $table = 'job_posts';
 
-    /**
-     * Mass-assignable attributes
-     */
     protected $fillable = [
         'employer_id',
         'title',
@@ -29,36 +26,14 @@ class Job extends Model
         'posted_at',
     ];
 
-    /**
-     * Attribute casting
-     */
     protected $casts = [
         'required_skills' => 'array',
-        'lat'             => 'decimal:7',
-        'lng'             => 'decimal:7',
-        'posted_at'       => 'datetime',
+        'lat'       => 'decimal:7',
+        'lng'       => 'decimal:7',
+        'posted_at' => 'datetime',
     ];
 
-    /**
-     * Relationships
-     */
-    public function employer()
-    {
-        return $this->belongsTo(User::class, 'employer_id');
-    }
-
-    public function applications()
-    {
-        return $this->hasMany(Application::class, 'job_id');
-    }
-
-    public function messages()
-    {
-        return $this->hasMany(Message::class, 'job_id');
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class, 'job_id');
-    }
+    public function employer()     { return $this->belongsTo(User::class, 'employer_id'); }
+    public function applications() { return $this->hasMany(Application::class, 'job_id'); }
+    public function messages()     { return $this->hasMany(Message::class, 'job_id'); }
 }

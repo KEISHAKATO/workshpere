@@ -3,15 +3,19 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 
-// Employer controllers
+// Employer
 use App\Http\Controllers\Employer\JobPostController;
 use App\Http\Controllers\Employer\ApplicationReviewController;
 use App\Http\Controllers\Employer\ProfileController as EmployerProfileController;
 
-// Seeker controllers
+// Seeker
 use App\Http\Controllers\Seeker\BrowseJobsController;
 use App\Http\Controllers\Seeker\ApplyController;
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
+use App\Http\Controllers\Seeker\MyApplicationsController;
+
+// Public jobs
+use App\Http\Controllers\PublicJobsController;
 
 // Messaging
 use App\Http\Controllers\MessageController;
@@ -19,25 +23,22 @@ use App\Http\Controllers\MessageController;
 // Admin
 use App\Http\Controllers\Admin\UsersController;
 
-
-// Public / Auth basics
-use App\Http\Controllers\PublicJobsController;
-
-
-// PUBLIC job detail (no login required)
+/*
+Public
+*/
+Route::get('/', fn () => view('welcome'));
 Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.index');
 Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
-// Welcome page
-Route::get('/', function () {
-    return view('welcome');
-});
 
-// Dashboard (available for all roles after login/verification)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+Dashboard
+*/
+Route::get('/dashboard', fn () => view('dashboard'))
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
-// Redirect generic /profile to role-specific editor
+/*
+Redirect generic /profile -> role-specific editor
+*/
 Route::middleware('auth')->group(function () {
     Route::get('/profile', function () {
         $u = auth()->user();
@@ -45,17 +46,17 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('employer.profile.edit');
         }
         return redirect()->route('seeker.profile.edit');
-    })->name('profile'); // keeps a familiar name if you link to "Account Settings"
+    })->name('profile');
 });
 
+/*
+Authenticated areas
+*/
+Route::middleware('auth')->group(function () {
 
-// Authenticated areas
-
-Route::middleware(['auth'])->group(function () {
-
-
-    // Employer-only area
-
+    /*
+    Employer
+    */
     Route::middleware([RoleMiddleware::class . ':employer,admin'])
         ->prefix('employer')->name('employer.')
         ->group(function () {
@@ -63,7 +64,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('profile', [EmployerProfileController::class, 'edit'])->name('profile.edit');
             Route::patch('profile', [EmployerProfileController::class, 'update'])->name('profile.update');
 
-            // Job posts CRUD
+            // Job posts
             Route::get('job-posts', [JobPostController::class, 'index'])->name('job_posts.index');
             Route::get('job-posts/create', [JobPostController::class, 'create'])->name('job_posts.create');
             Route::post('job-posts', [JobPostController::class, 'store'])->name('job_posts.store');
@@ -72,15 +73,15 @@ Route::middleware(['auth'])->group(function () {
             Route::put('job-posts/{job}', [JobPostController::class, 'update'])->name('job_posts.update');
             Route::delete('job-posts/{job}', [JobPostController::class, 'destroy'])->name('job_posts.destroy');
 
-            // Applications management
+            // Applications
             Route::get('job-posts/{job}/applications', [ApplicationReviewController::class, 'index'])->name('applications.index');
             Route::get('applications/{application}', [ApplicationReviewController::class, 'show'])->name('applications.show');
             Route::put('applications/{application}/status', [ApplicationReviewController::class, 'updateStatus'])->name('applications.updateStatus');
         });
 
-
-    // Seeker-only area
-
+    /*
+    Seeker
+    */
     Route::middleware([RoleMiddleware::class . ':seeker,admin'])
         ->prefix('seeker')->name('seeker.')
         ->group(function () {
@@ -88,28 +89,28 @@ Route::middleware(['auth'])->group(function () {
             Route::get('profile', [SeekerProfileController::class, 'edit'])->name('profile.edit');
             Route::patch('profile', [SeekerProfileController::class, 'update'])->name('profile.update');
 
-            // Browse/apply jobs
+            // Jobs
             Route::get('jobs', [BrowseJobsController::class, 'index'])->name('jobs.index');
             Route::get('jobs/{job}', [BrowseJobsController::class, 'show'])->name('jobs.show');
             Route::post('jobs/{job}/apply', [ApplyController::class, 'store'])->name('apply.store');
 
             // My Applications
-            Route::get('applications', [\App\Http\Controllers\Seeker\MyApplicationsController::class, 'index'])
-                ->name('applications.index');
+            Route::get('applications', [MyApplicationsController::class, 'index'])->name('applications.index');
+            Route::delete('applications/{application}', [MyApplicationsController::class, 'destroy'])->name('applications.destroy');
+        });
 
-            Route::delete('applications/{application}', [\App\Http\Controllers\Seeker\MyApplicationsController::class, 'destroy'])
-                ->name('applications.destroy');
+    /*
+    Messaging (both roles)
+    
+    */
+    Route::get('/jobs/{job}/chat', [MessageController::class, 'index'])->name('chat.show');
+    Route::get('/jobs/{job}/messages', [MessageController::class, 'fetch'])->name('chat.fetch'); // optional JSON polling
+    Route::post('/jobs/{job}/messages', [MessageController::class, 'store'])->name('chat.store');
 
-                    });
-
-
-    // Messaging (both roles)
-
-    Route::post('jobs/{job}/messages', [MessageController::class, 'store'])->name('messages.store');
-
-
-    // Admin-only area
-
+    /*
+    
+    Admin
+    */
     Route::middleware([RoleMiddleware::class . ':admin'])
         ->prefix('admin')->name('admin.')
         ->group(function () {
@@ -117,5 +118,4 @@ Route::middleware(['auth'])->group(function () {
         });
 });
 
-// Authentication routes (login, register, etc.)
 require __DIR__ . '/auth.php';

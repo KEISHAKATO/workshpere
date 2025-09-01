@@ -30,7 +30,7 @@
                         <div class="text-sm text-gray-500 mt-1">
                             {{ $profile->location_city ?? '—' }}, {{ $profile->location_county ?? '—' }}
                         </div>
-                    @endif>
+                    @endif
                 </div>
 
                 {{-- Current application status --}}
@@ -48,7 +48,7 @@
             </div>
         </section>
 
-        {{-- Cover letter (if provided) --}}
+        {{-- Cover letter --}}
         @if($application->cover_letter)
             <section class="bg-white shadow rounded-xl p-6">
                 <h4 class="font-semibold mb-2">Cover Letter</h4>
@@ -65,7 +65,6 @@
             @if(!$profile)
                 <p class="text-gray-600">This applicant hasn’t filled in their profile yet.</p>
             @else
-                {{-- Short Bio (one-liner) --}}
                 @if(!empty($profile->bio))
                     <div class="mb-4">
                         <div class="text-xs uppercase text-gray-500 mb-1">Bio</div>
@@ -73,7 +72,6 @@
                     </div>
                 @endif
 
-                {{-- About (longer) --}}
                 @if(!empty($profile->about))
                     <div class="mb-4">
                         <div class="text-xs uppercase text-gray-500 mb-1">About</div>
@@ -83,7 +81,6 @@
                     </div>
                 @endif
 
-                {{-- Skills --}}
                 @if(is_array($profile->skills) && count($profile->skills))
                     <div class="mb-4">
                         <div class="text-xs uppercase text-gray-500 mb-1">Skills</div>
@@ -97,7 +94,6 @@
                     </div>
                 @endif
 
-                {{-- Experience --}}
                 <div class="grid sm:grid-cols-3 gap-4 mb-4">
                     <div>
                         <div class="text-xs uppercase text-gray-500 mb-1">Experience</div>
@@ -115,7 +111,6 @@
                     </div>
                 </div>
 
-                {{-- Coordinates (optional) --}}
                 @if(!is_null($profile->lat) || !is_null($profile->lng))
                     <div class="grid sm:grid-cols-2 gap-4">
                         <div>
@@ -131,7 +126,7 @@
             @endif
         </section>
 
-        {{-- Quick actions (Accept / Reject) --}}
+        {{-- Quick actions --}}
         <section class="bg-white shadow rounded-xl p-6">
             <h4 class="font-semibold mb-3">Actions</h4>
             <form method="POST" action="{{ route('employer.applications.updateStatus', $application) }}" class="flex flex-wrap gap-2">

@@ -82,6 +82,12 @@
                                             View Job
                                         </a>
 
+                                        {{-- Seeker -> Employer chat (no seeker_id needed) --}}
+                                        <a href="{{ route('chat.show', $job) }}"
+                                           class="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200">
+                                            Chat
+                                        </a>
+
                                         @if($app->status === 'pending')
                                             <form method="POST" action="{{ route('seeker.applications.destroy', $app) }}"
                                                   onsubmit="return confirm('Withdraw this application?');">
