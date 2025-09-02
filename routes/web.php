@@ -96,7 +96,7 @@ Route::middleware('auth')->group(function () {
 
             // My Applications
             Route::get('applications', [MyApplicationsController::class, 'index'])->name('applications.index');
-            Route::delete('applications/{application}', [MyApplicationsController::class, 'destroy'])->name('applications.destroy');
+Route::delete('applications/{application}', [MyApplicationsController::class, 'destroy'])->name('applications.destroy');
         });
 
     /*

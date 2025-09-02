@@ -3,63 +3,62 @@
 namespace App\Http\Controllers\Employer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Application;
 use App\Models\Job;
+use App\Models\Application;
+use App\Models\Message;   // ✅ Correct: import the Eloquent model, not a controller
 use Illuminate\Http\Request;
 
 class ApplicationReviewController extends Controller
 {
-    // GET /employer/job-posts/{job}/applications
     public function index(Request $request, Job $job)
     {
-        $user = $request->user();
+        // Only the employer who owns this job (or admin via middleware) can view
+        abort_if($request->user()->id !== (int) $job->employer_id, 403);
 
-        // Only the owning employer (or admin) can view
-        if (!($user->isAdmin() || $job->employer_id === $user->id)) {
-            abort(403);
-        }
-
-        $applications = Application::with(['seeker.profile'])
+        // List applications with seeker relation
+        $applications = Application::with(['seeker:id,name,email'])
             ->where('job_id', $job->id)
             ->latest()
-            ->paginate(15);
+            ->get();
 
-        return view('employer.applications.index', compact('job', 'applications'));
+        // Unread messages for each seeker thread (employer is the receiver)
+        $unreadBySeeker = Message::query()
+            ->selectRaw('sender_id, COUNT(*) as c')
+            ->where('job_id', $job->id)
+            ->whereNull('read_at')
+            ->where('receiver_id', $request->user()->id)
+            ->groupBy('sender_id')
+            ->pluck('c', 'sender_id'); // [seeker_id => count]
+
+        return view('employer.applications.index', [
+            'job'            => $job,
+            'applications'   => $applications,
+            'unreadBySeeker' => $unreadBySeeker,
+        ]);
     }
 
-    // PUT /employer/applications/{application}/status
-    public function updateStatus(Request $request, Application $application)
+    public function show(Request $request, Application $application)
     {
-        $user = $request->user();
+        // Ensure the logged-in employer owns the job for this application
+        abort_if($request->user()->id !== (int) $application->job->employer_id, 403);
 
-        // Ensure the application belongs to a job owned by this employer (or admin)
-        if (!($user->isAdmin() || $application->job->employer_id === $user->id)) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'status' => ['required', 'in:pending,accepted,rejected'],
-        ]);
-
-        $application->update(['status' => $data['status']]);
-
-        return back()->with('ok', 'Application status updated.');
-    }
-    public function show(\App\Models\Application $application)
-    {
-        // Security: only the employer who owns the job can view
-        abort_unless($application->job && $application->job->employer_id === auth()->id(), 403);
-
-        // Eager load seeker + profile + job for the view
-        $application->load([
-            'job',
-            'seeker.profile',
-        ]);
-
-        $seeker = $application->seeker;
-        $profile = $seeker?->profile;
+        $seeker  = $application->seeker()->first();      // name, email
+        $profile = optional($seeker)->profile;            // can be null
 
         return view('employer.applications.show', compact('application', 'seeker', 'profile'));
     }
 
+    public function updateStatus(Request $request, Application $application)
+    {
+        // Ensure the logged-in employer owns the job for this application
+        abort_if($request->user()->id !== (int) $application->job->employer_id, 403);
+
+        $data = $request->validate([
+            'status' => 'required|in:pending,accepted,rejected',
+        ]);
+
+        $application->update(['status' => $data['status']]);
+
+        return back()->with('status', 'Application status updated.');
+    }
 }

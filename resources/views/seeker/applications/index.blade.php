@@ -78,19 +78,29 @@
                                 <td class="px-6 py-4">
                                     <div class="flex justify-end gap-2">
                                         <a href="{{ route('public.jobs.show', $job) }}"
-                                           class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
+                                        class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
                                             View Job
                                         </a>
 
-                                        {{-- Seeker -> Employer chat (no seeker_id needed) --}}
+                                        {{-- Chat --}}
+                                        @php
+                                            $badge = $unreadByJob[$job->id] ?? 0;
+                                        @endphp
                                         <a href="{{ route('chat.show', $job) }}"
-                                           class="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200">
+                                        class="relative px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200">
                                             Chat
+                                            @if($badge > 0)
+                                                <span class="absolute -top-2 -right-2 inline-flex items-center justify-center
+                                                            text-[10px] font-semibold text-white bg-red-600 rounded-full
+                                                            h-5 min-w-[20px] px-1">
+                                                    {{ $badge }}
+                                                </span>
+                                            @endif
                                         </a>
 
                                         @if($app->status === 'pending')
                                             <form method="POST" action="{{ route('seeker.applications.destroy', $app) }}"
-                                                  onsubmit="return confirm('Withdraw this application?');">
+                                                onsubmit="return confirm('Withdraw this application?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="px-3 py-1.5 rounded bg-gray-600 text-white hover:bg-gray-700">
@@ -100,6 +110,7 @@
                                         @endif
                                     </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>

@@ -24,13 +24,27 @@
                 </thead>
                 <tbody>
                     @forelse($applications as $app)
+                        @php
+                            // unreadBySeeker is a map: [seeker_id => count]
+                            $unread = (int) ($unreadBySeeker[$app->seeker_id] ?? 0);
+                        @endphp
                         <tr class="border-t">
                             <td class="px-4 py-2">
-                                <div class="font-medium text-gray-900">
-                                    {{ $app->seeker->name }}
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $app->seeker->email }}
+                                <div class="flex items-center gap-2">
+                                    <div>
+                                        <div class="font-medium text-gray-900">
+                                            {{ $app->seeker->name }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ $app->seeker->email }}
+                                        </div>
+                                    </div>
+                                    @if($unread > 0)
+                                        <span class="ml-1 inline-flex items-center justify-center text-[10px] font-semibold
+                                                     bg-blue-600 text-white rounded-full h-5 min-w-5 px-1.5">
+                                            {{ $unread }}
+                                        </span>
+                                    @endif
                                 </div>
                             </td>
 
@@ -56,10 +70,16 @@
                                     View
                                 </a>
 
-                                {{-- Chat with applicant (must pass seeker_id) --}}
-                                <a href="{{ route('chat.show', ['job' => $app->job_id, 'seeker_id' => $app->seeker_id]) }}"
+                                {{-- Chat with applicant (preserve unread context) --}}
+                                <a href="{{ route('chat.show', [$app->job, 'seeker_id' => $app->seeker_id]) }}"
                                    class="text-sm px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">
                                     Chat
+                                    @if($unread > 0)
+                                        <span class="ml-1 inline-flex items-center justify-center text-[10px] font-semibold
+                                                     bg-blue-600 text-white rounded-full h-4 min-w-4 px-1">
+                                            {{ $unread }}
+                                        </span>
+                                    @endif
                                 </a>
 
                                 {{-- Quick Accept/Reject --}}
