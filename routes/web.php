@@ -23,6 +23,10 @@ use App\Http\Controllers\MessageController;
 // Admin
 use App\Http\Controllers\Admin\UsersController;
 
+// Dashboard
+use App\Http\Controllers\DashboardController;
+
+
 /*
 Public
 */
@@ -33,8 +37,9 @@ Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.j
 /*
 Dashboard
 */
-Route::get('/dashboard', fn () => view('dashboard'))
-    ->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 /*
 Redirect generic /profile -> role-specific editor
@@ -96,7 +101,7 @@ Route::middleware('auth')->group(function () {
 
             // My Applications
             Route::get('applications', [MyApplicationsController::class, 'index'])->name('applications.index');
-Route::delete('applications/{application}', [MyApplicationsController::class, 'destroy'])->name('applications.destroy');
+            Route::delete('applications/{application}', [MyApplicationsController::class, 'destroy'])->name('applications.destroy');
         });
 
     /*

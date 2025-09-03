@@ -54,6 +54,43 @@
                         <a href="{{ route('seeker.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Profile</a>
                     </div>
                 </section>
+
+                {{-- Recommended Jobs --}}
+                @if(isset($seekerRecommendations) && $seekerRecommendations->isNotEmpty())
+                    <section class="bg-white shadow rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Recommended Jobs for You</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach($seekerRecommendations as $rec)
+                                @php
+                                    /** @var \App\Models\Job $job */
+                                    $job   = $rec['job'];
+                                    $score = $rec['score'];
+                                @endphp
+                                <a href="{{ route('public.jobs.show', $job) }}"
+                                   class="block border rounded-xl p-4 hover:bg-gray-50">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="font-semibold">{{ $job->title }}</div>
+                                            <div class="text-sm text-gray-600 mt-1">
+                                                {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
+                                                • {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
+                                            </div>
+                                            @if(is_array($job->required_skills) && count($job->required_skills))
+                                                <div class="mt-2 text-xs text-gray-500 line-clamp-1">
+                                                    Skills: {{ implode(', ', $job->required_skills) }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xs uppercase text-gray-500">Match</div>
+                                            <div class="text-lg font-bold">{{ $score }}%</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
             @endif
 
             {{-- Employer section --}}
@@ -89,6 +126,37 @@
                         <a href="{{ route('employer.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Company Profile</a>
                     </div>
                 </section>
+
+                {{-- Suggested Candidates --}}
+                @if(isset($employerSuggestions) && $employerSuggestions->isNotEmpty())
+                    <section class="bg-white shadow rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Suggested Candidates</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($employerSuggestions as $row)
+                                @php
+                                    /** @var \App\Models\Profile $p */
+                                    $p = $row['profile'];
+                                    $best = $row['best_score'];
+                                @endphp
+                                <div class="border rounded-xl p-4">
+                                    <div class="font-semibold">{{ $p->user?->name ?? 'Seeker #'.$p->user_id }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ $p->location_city ?? '—' }}, {{ $p->location_county ?? '—' }}
+                                    </div>
+                                    @if(is_array($p->skills) && count($p->skills))
+                                        <div class="mt-2 text-xs text-gray-500 line-clamp-2">
+                                            Skills: {{ implode(', ', array_slice($p->skills, 0, 8)) }}
+                                        </div>
+                                    @endif
+                                    <div class="mt-3 text-right">
+                                        <span class="text-xs uppercase text-gray-500">Match</span>
+                                        <span class="text-lg font-bold ml-1">{{ $best }}%</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
             @endif
 
             {{-- Admin section --}}
