@@ -1,0 +1,15 @@
+Samples: total=50, train=25, test=25
+Split mode: stratified
+Accuracy: 0.5600
+Precision: 0.0000
+Recall: 0.0000
+
+Classification report:
+              precision    recall  f1-score   support
+
+           0       0.56      1.00      0.72        14
+           1       0.00      0.00      0.00        11
+
+    accuracy                           0.56        25
+   macro avg       0.28      0.50      0.36        25
+weighted avg       0.31      0.56      0.40        25

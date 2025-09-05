@@ -9,3 +9,18 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+* text=auto
+*.ps1 text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+
+# Binary files should not be modified
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary

@@ -539,6 +539,8 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\ExportMlDataset' => __DIR__ . '/../..' . '/app/Console/Commands/ExportMlDataset.php',
+        'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Http\\Controllers\\Admin\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/UsersController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
@@ -550,6 +552,7 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
         'App\\Http\\Controllers\\Auth\\RegisteredUserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/RegisteredUserController.php',
         'App\\Http\\Controllers\\Auth\\VerifyEmailController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerifyEmailController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\Employer\\ApplicationReviewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employer/ApplicationReviewController.php',
         'App\\Http\\Controllers\\Employer\\JobPostController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employer/JobPostController.php',
         'App\\Http\\Controllers\\Employer\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employer/ProfileController.php',
@@ -575,6 +578,8 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
         'App\\Policies\\ProfilePolicy' => __DIR__ . '/../..' . '/app/Policies/ProfilePolicy.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
+        'App\\Services\\LocationNormalizer' => __DIR__ . '/../..' . '/app/Services/LocationNormalizer.php',
+        'App\\Services\\Matcher' => __DIR__ . '/../..' . '/app/Services/Matcher.php',
         'App\\View\\Components\\AppLayout' => __DIR__ . '/../..' . '/app/View/Components/AppLayout.php',
         'App\\View\\Components\\GuestLayout' => __DIR__ . '/../..' . '/app/View/Components/GuestLayout.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
@@ -703,6 +708,7 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
         'Database\\Seeders\\DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeders/DatabaseSeeder.php',
         'Database\\Seeders\\DemoSeeder' => __DIR__ . '/../..' . '/database/seeders/DemoSeeder.php',
         'Database\\Seeders\\RelationshipTestSeeder' => __DIR__ . '/../..' . '/database/seeders/RelationshipTestSeeder.php',
+        'Database\\Seeders\\SyntheticMlSeeder' => __DIR__ . '/../..' . '/database/seeders/SyntheticMlSeeder.php',
         'DateError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
         'DateException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateException.php',
         'DateInvalidOperationException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateInvalidOperationException.php',

@@ -2,54 +2,43 @@
 
 namespace Database\Factories;
 
+use App\Models\Job;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class JobFactory extends Factory
 {
+    protected $model = Job::class;
+
     public function definition(): array
     {
-        $categories = ['construction','tailoring','delivery','cleaning','electrical','plumbing'];
-        $skillsByCat = [
-            'construction' => ['carpentry','masonry'],
-            'tailoring'    => ['tailoring'],
-            'delivery'     => ['driving'],
-            'cleaning'     => ['cleaning'],
-            'electrical'   => ['electrical wiring'],
-            'plumbing'     => ['plumbing'],
+        $jobTypes = ['full_time','part_time','gig','contract']; // <= matches DB enum
+
+        $skillsPool = [
+            'PHP','Laravel','MySQL','Vue','React','Node.js','Docker','AWS','Redis','Git',
+            'REST APIs','CI/CD','PostgreSQL','Kotlin','Swift'
         ];
-        $cities  = ['Nairobi','Mombasa','Kisumu','Nakuru','Eldoret','Thika'];
-        $counties = ['Nairobi','Mombasa','Kisumu','Nakuru','Uasin Gishu','Kiambu'];
 
-        $cat = $this->faker->randomElement($categories);
-
-        $roleNouns = [
-            'Skilled Carpenter','Experienced Plumber','Professional Driver','Tailor',
-            'Electrician','General Cleaner','Mason'
-        ];
-        $title = $this->faker->randomElement($roleNouns).' Needed';
-
-        $desc = $this->faker->randomElement([
-            'We need a reliable professional to support a short project.',
-            'Looking for a responsible worker to assist with daily tasks.',
-            'Join our team for a hands-on assignment with fair pay.',
-            'Seeking someone careful, punctual and focused on quality.',
-        ]);
+        $reqSkills = $this->faker->randomElements($skillsPool, $this->faker->numberBetween(3, 6));
 
         return [
-            'title'            => $title,
-            'description'      => $desc,
-            'category'         => $cat,
-            'job_type'         => $this->faker->randomElement(['gig','contract','full_time','part_time']),
-            'pay_min'          => $this->faker->numberBetween(800, 3000),
-            'pay_max'          => $this->faker->numberBetween(3001, 8000),
-            'currency'         => 'KES',
-            'location_city'    => $this->faker->randomElement($cities),
-            'location_county'  => $this->faker->randomElement($counties),
-            'lat'              => null,
-            'lng'              => null,
-            'required_skills'  => $skillsByCat[$cat],
-            'status'           => 'open',
-            'posted_at'        => now(),
+            'employer_id'     => User::factory()->state(['role' => 'employer']),
+            'title'           => $this->faker->jobTitle(),
+            'description'     => $this->faker->paragraphs(4, true),
+            'category'        => $this->faker->randomElement([
+                'Technology','Education','Healthcare','Finance','Retail','Construction','Hospitality'
+            ]),
+            'job_type'        => $this->faker->randomElement($jobTypes),
+            'pay_min'         => $this->faker->numberBetween(50_000, 200_000),
+            'pay_max'         => $this->faker->numberBetween(200_001, 450_000),
+            'currency'        => 'KES',
+            'location_city'   => $this->faker->randomElement(['Nairobi','Mombasa','Kisumu','Nakuru']),
+            'location_county' => $this->faker->randomElement(['Nairobi County','Mombasa County','Kisumu County','Nakuru County']),
+            'lat'             => $this->faker->randomFloat(7, -1.5, 1.5),
+            'lng'             => $this->faker->randomFloat(7, 36.5, 41.0),
+            'required_skills' => array_values($reqSkills),
+            'status'          => 'open',
+            'posted_at'       => $this->faker->dateTimeBetween('-60 days', 'now'),
         ];
     }
 }
