@@ -22,7 +22,13 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
+
+            // Share validation errors with views
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+
+            // 🔒 Block suspended users for ALL web routes
+            \App\Http\Middleware\EnsureUserIsActive::class,
+
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -33,7 +39,7 @@ class Kernel extends HttpKernel
         ],
     ];
 
-    // 👇 Laravel 12: aliases live here (NOT $routeMiddleware)
+    // aliases
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -45,6 +51,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'role'   => \App\Http\Middleware\RoleMiddleware::class,
+        'active' => \App\Http\Middleware\EnsureUserIsActive::class, // (optional alias)
     ];
 }

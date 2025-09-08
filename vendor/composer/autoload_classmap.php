@@ -8,6 +8,9 @@ $baseDir = dirname($vendorDir);
 return array(
     'App\\Console\\Commands\\ExportMlDataset' => $baseDir . '/app/Console/Commands/ExportMlDataset.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
+    'App\\Http\\Controllers\\Admin\\ApplicationsController' => $baseDir . '/app/Http/Controllers/Admin/ApplicationsController.php',
+    'App\\Http\\Controllers\\Admin\\DashboardController' => $baseDir . '/app/Http/Controllers/Admin/DashboardController.php',
+    'App\\Http\\Controllers\\Admin\\JobsController' => $baseDir . '/app/Http/Controllers/Admin/JobsController.php',
     'App\\Http\\Controllers\\Admin\\UsersController' => $baseDir . '/app/Http/Controllers/Admin/UsersController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
     'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => $baseDir . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
@@ -31,6 +34,8 @@ return array(
     'App\\Http\\Controllers\\Seeker\\MyApplicationsController' => $baseDir . '/app/Http/Controllers/Seeker/MyApplicationsController.php',
     'App\\Http\\Controllers\\Seeker\\ProfileController' => $baseDir . '/app/Http/Controllers/Seeker/ProfileController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
+    'App\\Http\\Middleware\\BlockSuspended' => $baseDir . '/app/Http/Middleware/BlockSuspended.php',
+    'App\\Http\\Middleware\\EnsureUserIsActive' => $baseDir . '/app/Http/Middleware/EnsureUserIsActive.php',
     'App\\Http\\Middleware\\RoleMiddleware' => $baseDir . '/app/Http/Middleware/RoleMiddleware.php',
     'App\\Http\\Requests\\Auth\\LoginRequest' => $baseDir . '/app/Http/Requests/Auth/LoginRequest.php',
     'App\\Http\\Requests\\EmployerProfileUpdateRequest' => $baseDir . '/app/Http/Requests/EmployerProfileUpdateRequest.php',

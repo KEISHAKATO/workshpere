@@ -22,29 +22,31 @@ use App\Http\Controllers\MessageController;
 
 // Admin
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\JobsController;
+use App\Http\Controllers\Admin\ApplicationsController;
 
-// Dashboard
+// App dashboard (invokable)
 use App\Http\Controllers\DashboardController;
 
-
 /*
-Public
+| Public
 */
 Route::get('/', fn () => view('welcome'));
 Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.index');
 Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
 
 /*
-Dashboard
+| Dashboard (EnsureUserIsActive is applied globally via Kernel's web group)
 */
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 /*
-Redirect generic /profile -> role-specific editor
+| Redirect generic /profile -> role-specific editor
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/profile', function () {
         $u = auth()->user();
         if (method_exists($u, 'isEmployer') && ($u->isEmployer() || $u->isAdmin())) {
@@ -55,12 +57,12 @@ Route::middleware('auth')->group(function () {
 });
 
 /*
-Authenticated areas
+| Authenticated areas
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     /*
-    Employer
+    | Employer
     */
     Route::middleware([RoleMiddleware::class . ':employer,admin'])
         ->prefix('employer')->name('employer.')
@@ -85,7 +87,7 @@ Route::middleware('auth')->group(function () {
         });
 
     /*
-    Seeker
+    | Seeker
     */
     Route::middleware([RoleMiddleware::class . ':seeker,admin'])
         ->prefix('seeker')->name('seeker.')
@@ -105,21 +107,35 @@ Route::middleware('auth')->group(function () {
         });
 
     /*
-    Messaging (both roles)
-    
+    | Messaging (both roles)
     */
     Route::get('/jobs/{job}/chat', [MessageController::class, 'index'])->name('chat.show');
-    Route::get('/jobs/{job}/messages', [MessageController::class, 'fetch'])->name('chat.fetch'); // optional JSON polling
+    Route::get('/jobs/{job}/messages', [MessageController::class, 'fetch'])->name('chat.fetch');
     Route::post('/jobs/{job}/messages', [MessageController::class, 'store'])->name('chat.store');
 
     /*
-    
-    Admin
+    | Admin
     */
     Route::middleware([RoleMiddleware::class . ':admin'])
         ->prefix('admin')->name('admin.')
         ->group(function () {
+            // Dashboard
+            Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+            // Users
             Route::get('users', [UsersController::class, 'index'])->name('users.index');
+            Route::put('users/{user}/toggle-active', [UsersController::class, 'toggleActive'])->name('users.toggleActive');
+            Route::put('users/{user}/toggle-flag',   [UsersController::class, 'toggleFlag'])->name('users.toggleFlag');
+
+            // Jobs
+            Route::get('jobs', [JobsController::class, 'index'])->name('jobs.index');
+            Route::put('jobs/{job}/toggle-flag', [JobsController::class, 'toggleFlag'])->name('jobs.toggleFlag');
+            Route::put('jobs/{job}/status',      [JobsController::class, 'setStatus'])->name('jobs.setStatus');
+
+            // Applications
+            Route::get('applications', [ApplicationsController::class, 'index'])->name('applications.index');
+            Route::put('applications/{application}/status', [ApplicationsController::class, 'updateStatus'])
+                ->name('applications.updateStatus');
         });
 });
 

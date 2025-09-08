@@ -1,8 +1,6 @@
 {{-- resources/views/dashboard.blade.php --}}
 <x-app-layout>
-    @php
-        $user = auth()->user();
-    @endphp
+    @php $user = auth()->user(); @endphp
 
     <x-slot name="header">
         <div>
@@ -10,12 +8,15 @@
                 Dashboard – {{ ucfirst($user->role) }}
             </h2>
             <p class="text-sm text-gray-600 mt-1">
-                @switch($user->role)
-                    @case('seeker')  Find and apply for jobs that match your skills. @break
-                    @case('employer') Post jobs and manage applicants in one place. @break
-                    @case('admin')    Monitor activity and manage the platform. @break
-                    @default          Welcome back!
-                @endswitch
+                @if($user->isSeeker())
+                    Find and apply for jobs that match your skills.
+                @elseif($user->isEmployer())
+                    Post jobs and manage applicants in one place.
+                @elseif($user->isAdmin())
+                    Monitor activity and manage the platform.
+                @else
+                    Welcome back!
+                @endif
             </p>
         </div>
     </x-slot>
@@ -23,8 +24,8 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-            {{-- Seeker section --}}
-            @if($user->isSeeker() || $user->isAdmin())
+            {{-- Seeker section (ONLY seekers) --}}
+            @if($user->isSeeker())
                 @php
                     $myApplications = \App\Models\Application::where('seeker_id', $user->id)->count();
                     $pendingApps    = \App\Models\Application::where('seeker_id', $user->id)->where('status','pending')->count();
@@ -55,19 +56,14 @@
                     </div>
                 </section>
 
-                {{-- Recommended Jobs --}}
+                {{-- Recommended Jobs (if provided by controller) --}}
                 @if(isset($seekerRecommendations) && $seekerRecommendations->isNotEmpty())
                     <section class="bg-white shadow rounded-xl p-6">
                         <h3 class="text-lg font-semibold mb-4">Recommended Jobs for You</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($seekerRecommendations as $rec)
-                                @php
-                                    /** @var \App\Models\Job $job */
-                                    $job   = $rec['job'];
-                                    $score = $rec['score'];
-                                @endphp
-                                <a href="{{ route('public.jobs.show', $job) }}"
-                                   class="block border rounded-xl p-4 hover:bg-gray-50">
+                                @php /** @var \App\Models\Job $job */ $job = $rec['job']; $score = $rec['score']; @endphp
+                                <a href="{{ route('public.jobs.show', $job) }}" class="block border rounded-xl p-4 hover:bg-gray-50">
                                     <div class="flex items-start justify-between">
                                         <div>
                                             <div class="font-semibold">{{ $job->title }}</div>
@@ -93,11 +89,11 @@
                 @endif
             @endif
 
-            {{-- Employer section --}}
-            @if($user->isEmployer() || $user->isAdmin())
+            {{-- Employer section (ONLY employers) --}}
+            @if($user->isEmployer())
                 @php
-                    $myJobs            = \App\Models\Job::where('employer_id',$user->id)->count();
-                    $myOpenJobs        = \App\Models\Job::where('employer_id',$user->id)->where('status','open')->count();
+                    $myJobs             = \App\Models\Job::where('employer_id',$user->id)->count();
+                    $myOpenJobs         = \App\Models\Job::where('employer_id',$user->id)->where('status','open')->count();
                     $incomingApplicants = \App\Models\Application::whereHas('job', fn($q)=>$q->where('employer_id',$user->id))
                         ->where('status','pending')->count();
                 @endphp
@@ -127,17 +123,13 @@
                     </div>
                 </section>
 
-                {{-- Suggested Candidates --}}
+                {{-- Suggested Candidates (if provided by controller) --}}
                 @if(isset($employerSuggestions) && $employerSuggestions->isNotEmpty())
                     <section class="bg-white shadow rounded-xl p-6">
                         <h3 class="text-lg font-semibold mb-4">Suggested Candidates</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($employerSuggestions as $row)
-                                @php
-                                    /** @var \App\Models\Profile $p */
-                                    $p = $row['profile'];
-                                    $best = $row['best_score'];
-                                @endphp
+                                @php /** @var \App\Models\Profile $p */ $p = $row['profile']; $best = $row['best_score']; @endphp
                                 <div class="border rounded-xl p-4">
                                     <div class="font-semibold">{{ $p->user?->name ?? 'Seeker #'.$p->user_id }}</div>
                                     <div class="text-sm text-gray-600">
@@ -159,17 +151,16 @@
                 @endif
             @endif
 
-            {{-- Admin section --}}
+            {{-- Admin section (ONLY admins) --}}
             @if($user->isAdmin())
                 @php
-                    $userCount   = \App\Models\User::count();
-                    $jobCount    = \App\Models\Job::count();
-                    $appCount    = \App\Models\Application::count();
+                    $userCount = \App\Models\User::count();
+                    $jobCount  = \App\Models\Job::count();
+                    $appCount  = \App\Models\Application::count();
                 @endphp
 
                 <section class="bg-white shadow rounded-xl p-6">
                     <h3 class="text-lg font-semibold mb-4">Admin Overview</h3>
-
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="border rounded-lg p-4">
                             <div class="text-3xl font-bold">{{ $userCount }}</div>
@@ -185,12 +176,13 @@
                         </div>
                     </div>
 
-                    <div class="mt-5">
+                    <div class="mt-5 flex gap-3">
                         <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Users</a>
+                        <a href="{{ route('admin.jobs.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Jobs</a>
+                        <a href="{{ route('admin.applications.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Applications</a>
                     </div>
                 </section>
             @endif
-
         </div>
     </div>
 </x-app-layout>

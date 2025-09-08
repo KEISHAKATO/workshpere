@@ -12,15 +12,13 @@
                     Jobs
                 </a>
 
-
                 @auth
-                    {{-- Common link --}}
                     <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">
                         Dashboard
                     </a>
 
-                    {{-- Seeker menu --}}
-                    @if(auth()->user()->isSeeker() || auth()->user()->isAdmin())
+                    {{-- Seeker-only links --}}
+                    @if(auth()->user()->isSeeker())
                         <a href="{{ route('seeker.jobs.index') }}" class="text-gray-700 hover:text-gray-900">
                             Browse Jobs
                         </a>
@@ -32,8 +30,8 @@
                         </a>
                     @endif
 
-                    {{-- Employer menu --}}
-                    @if(auth()->user()->isEmployer() || auth()->user()->isAdmin())
+                    {{-- Employer-only links --}}
+                    @if(auth()->user()->isEmployer())
                         <a href="{{ route('employer.job_posts.index') }}" class="text-gray-700 hover:text-gray-900">
                             My Job Posts
                         </a>
@@ -45,10 +43,16 @@
                         </a>
                     @endif
 
-                    {{-- Admin menu --}}
+                    {{-- Admin-only links --}}
                     @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.users.index') }}" class="text-gray-700 hover:text-gray-900">
                             Users
+                        </a>
+                        <a href="{{ route('admin.jobs.index') }}" class="text-gray-700 hover:text-gray-900">
+                            Jobs
+                        </a>
+                        <a href="{{ route('admin.applications.index') }}" class="text-gray-700 hover:text-gray-900">
+                            Applications
                         </a>
                     @endif
                 @endauth

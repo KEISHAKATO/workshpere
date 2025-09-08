@@ -541,6 +541,9 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
     public static $classMap = array (
         'App\\Console\\Commands\\ExportMlDataset' => __DIR__ . '/../..' . '/app/Console/Commands/ExportMlDataset.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
+        'App\\Http\\Controllers\\Admin\\ApplicationsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/ApplicationsController.php',
+        'App\\Http\\Controllers\\Admin\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/DashboardController.php',
+        'App\\Http\\Controllers\\Admin\\JobsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/JobsController.php',
         'App\\Http\\Controllers\\Admin\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/UsersController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
@@ -564,6 +567,8 @@ class ComposerStaticInitbdc6d92507d397adf1c269ed49ec424d
         'App\\Http\\Controllers\\Seeker\\MyApplicationsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Seeker/MyApplicationsController.php',
         'App\\Http\\Controllers\\Seeker\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Seeker/ProfileController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\BlockSuspended' => __DIR__ . '/../..' . '/app/Http/Middleware/BlockSuspended.php',
+        'App\\Http\\Middleware\\EnsureUserIsActive' => __DIR__ . '/../..' . '/app/Http/Middleware/EnsureUserIsActive.php',
         'App\\Http\\Middleware\\RoleMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/RoleMiddleware.php',
         'App\\Http\\Requests\\Auth\\LoginRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Auth/LoginRequest.php',
         'App\\Http\\Requests\\EmployerProfileUpdateRequest' => __DIR__ . '/../..' . '/app/Http/Requests/EmployerProfileUpdateRequest.php',
