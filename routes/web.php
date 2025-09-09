@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\JobsController;
 use App\Http\Controllers\Admin\ApplicationsController;
+use App\Http\Controllers\Admin\ReportsController;
+
 
 // App dashboard (invokable)
 use App\Http\Controllers\DashboardController;
@@ -136,6 +138,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('applications', [ApplicationsController::class, 'index'])->name('applications.index');
             Route::put('applications/{application}/status', [ApplicationsController::class, 'updateStatus'])
                 ->name('applications.updateStatus');
+
+            // Reports
+            Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');
+            Route::get('reports/data', [ReportsController::class, 'data'])->name('reports.data');
         });
 });
 

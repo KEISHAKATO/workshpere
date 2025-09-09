@@ -1,3 +1,4 @@
+// resources/js/gmaps-autocomplete.js
 import { Loader } from '@googlemaps/js-api-loader';
 
 function getEl(sel) {
