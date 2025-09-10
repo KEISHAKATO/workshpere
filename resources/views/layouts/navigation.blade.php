@@ -38,6 +38,10 @@
                 @guest
                     <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">Log in</a>
                     <a href="{{ route('register') }}" class="text-gray-700 hover:text-gray-900">Register</a>
+                    <a href="#" onclick="if(window.BotManWidget){ BotManWidget.open(); } return false;">
+                    Chat Support
+                    </a>
+
                 @endguest
 
                 @auth

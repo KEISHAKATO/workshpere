@@ -35,6 +35,7 @@
     window.WORKSPHERE_GOOGLE_KEY = @json(config('services.google.maps_key'));
     </script>
 
+@include('partials.chatbot')
 
 </body>
 </html>

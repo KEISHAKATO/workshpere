@@ -31,12 +31,19 @@ use App\Http\Controllers\Admin\ReportsController;
 // App dashboard (invokable)
 use App\Http\Controllers\DashboardController;
 
+// Chatbot webhook (BotMan)
+use App\Http\Controllers\BotManController;
+
+
+
 /*
 | Public
 */
 Route::get('/', fn () => view('welcome'));
 Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.index');
 Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
+Route::match(['GET','POST'], '/botman', [BotManController::class, 'handle'])
+    ->name('botman.handle');
 
 /*
 | Dashboard (EnsureUserIsActive is applied globally via Kernel's web group)
