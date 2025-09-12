@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 
+use App\Models\Job;
+
 // Employer
 use App\Http\Controllers\Employer\JobPostController;
 use App\Http\Controllers\Employer\ApplicationReviewController;
@@ -42,7 +44,14 @@ use App\Http\Controllers\ReviewController;
 /*
 | Public
 */
-Route::get('/', fn () => view('welcome'));
+Route::get('/', function () {
+    $latestJobs = Job::where('status', 'open')
+        ->orderByDesc('posted_at')
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('latestJobs'));
+});
 Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.index');
 Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
 Route::match(['GET','POST'], '/botman', [BotManController::class, 'handle'])
