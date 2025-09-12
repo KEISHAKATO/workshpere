@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl">
-                Chat — {{ $job->title }}
+                Chat - {{ $job->title }}
             </h2>
             <a href="{{ url()->previous() }}" class="btn btn-sm">Back</a>
         </div>

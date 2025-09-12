@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ session('ui.theme', 'worksphere') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      data-theme="{{ session('ui.theme', 'worksphere') }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,16 +8,31 @@
 
     <title>{{ $title ?? config('app.name', 'Worksphere') }}</title>
 
-    {{-- Fonts (optional keep) --}}
+    {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300..700" rel="stylesheet">
 
-
-    {{-- Vite --}}
+    {{-- Expose Google Maps key for autocomplete --}}
     <script>window.WORKSPHERE_GOOGLE_KEY = @json(config('services.google.maps_key'));</script>
 
+    {{-- Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Theme guard --}}
+    <script>
+        (function () {
+            var theme = "{{ session('ui.theme', 'worksphere') }}";
+            if (theme !== 'dark') {
+                document.documentElement.classList.remove('dark');
+                try {
+                    if (localStorage.getItem('color-theme') === 'dark') {
+                        localStorage.removeItem('color-theme');
+                    }
+                } catch (e) {}
+            }
+        })();
+    </script>
 </head>
 <body class="font-sans antialiased bg-base-200 min-h-screen">
     <div class="drawer lg:drawer-open">
@@ -27,7 +43,7 @@
             {{-- Top Navbar --}}
             @include('layouts.navigation')
 
-            {{-- Page Heading (from x-slot name="header") --}}
+            {{-- Page Heading --}}
             @isset($header)
                 <header class="bg-base-100 border-b border-base-300">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -36,18 +52,17 @@
                 </header>
             @endisset
 
-            {{-- Page Content --}}
+            {{-- Main Content --}}
             <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
-                {{-- Flash (keeps your existing component) --}}
                 @includeWhen(session('status'), 'components.flash')
                 {{ $slot }}
             </main>
 
-            {{-- Chatbot bubble (existing partial) --}}
+            {{-- Chatbot --}}
             @include('partials.chatbot')
         </div>
 
-        {{-- Sidebar / Drawer --}}
+        {{-- Sidebar --}}
         <div class="drawer-side z-40">
             <label for="ws-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <aside class="w-72 bg-base-100 border-r border-base-300 min-h-full">

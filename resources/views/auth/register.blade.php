@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <div class="card bg-base-100 shadow-xl max-w-md mx-auto">
+    <div class="">
         <div class="card-body">
             <h1 class="card-title text-2xl">Create your account</h1>
 

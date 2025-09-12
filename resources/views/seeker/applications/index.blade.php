@@ -10,9 +10,7 @@
     </x-slot>
 
     <div class="max-w-6xl mx-auto p-4">
-        @if (session('status'))
-            <div class="alert alert-success mb-4"><span>{{ session('status') }}</span></div>
-        @endif
+
 
         @if($apps->isEmpty())
             <div class="card bg-base-100 shadow-xl">

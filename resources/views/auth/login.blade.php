@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="card bg-base-100 shadow-xl max-w-md mx-auto">
+    <div class="">
         <div class="card-body">
             <h1 class="card-title justify-center">Sign in</h1>
 

@@ -2,7 +2,6 @@
     <x-slot name="header"><h2 class="font-semibold text-xl">Users</h2></x-slot>
 
     <div class="max-w-6xl mx-auto p-4">
-        @if(session('status')) <div class="alert alert-success mb-4"><span>{{ session('status') }}</span></div> @endif
 
         <form method="GET" class="mb-4 flex gap-2 items-end">
             <div class="form-control">

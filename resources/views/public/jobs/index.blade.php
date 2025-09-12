@@ -29,7 +29,7 @@
                                         <span class="badge">{{ $s }}</span>
                                     @endforeach
                                 </div>
-                            @endif>
+                            @endif
                         </div>
                     @empty
                         <p class="py-6 opacity-70">No jobs found.</p>
