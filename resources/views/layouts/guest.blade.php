@@ -1,4 +1,3 @@
-{{-- resources/views/layouts/guest.blade.php --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ session('ui.theme', 'worksphere') }}">
     <head>
@@ -8,23 +7,20 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-base-200">
+    <body class="font-sans antialiased min-h-screen bg-cover bg-center"
+          style="background-image:url('https://ik.imagekit.io/xqjcglzri/workshpere-hero.png?updatedAt=1757700544438');">
         <div class="min-h-screen flex flex-col sm:justify-center items-center p-6">
             <div class="mb-6">
                 <a href="/">
                     <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-48 w-48">
-                    <!-- <span class="font-semibold">Worksphere</span> -->
                 </a>
             </div>
 
-            {{-- Single card container for auth forms --}}
             <div class="w-full sm:max-w-md bg-base-100 shadow-xl rounded-xl p-8">
                 {{ $slot }}
             </div>

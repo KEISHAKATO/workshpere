@@ -35,10 +35,11 @@
     </header>
 
     {{-- Hero --}}
-    <section class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <div class="grid lg:grid-cols-2 gap-10 items-center">
+    {{-- Hero --}}
+<section class="relative overflow-hidden bg-cover bg-center" style="background-image: url('https://ik.imagekit.io/xqjcglzri/workshpere-hero.png?updatedAt=1757700544438');">
+    <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
                 <div>
                     <h1 class="text-4xl sm:text-5xl font-bold leading-tight">
                         Worksphere - hire locally, <span class="text-primary">faster</span>.
