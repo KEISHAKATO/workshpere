@@ -34,7 +34,7 @@
         </div>
     </header>
 
-    {{-- Hero --}}
+    {{-- Hero --}
     {{-- Hero --}}
 <section class="relative overflow-hidden bg-cover bg-center" style="background-image: url('https://ik.imagekit.io/xqjcglzri/workshpere-hero.png?updatedAt=1757700544438');">
     <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
@@ -203,5 +203,6 @@
             </div>
         </div>
     </footer>
+    @include('partials.chatbot')
 </body>
 </html>
