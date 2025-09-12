@@ -68,8 +68,7 @@
             <aside class="w-72 bg-base-100 border-r border-base-300 min-h-full">
                 <div class="px-4 py-4 border-b border-base-300 flex items-center gap-2">
                     <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
-                        <x-application-logo class="h-8 w-8 text-primary" />
-                        <span class="font-semibold text-base-content">Worksphere</span>
+                        <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-48 w-48">
                     </a>
                 </div>
 
@@ -82,3 +81,7 @@
     @stack('scripts')
 </body>
 </html>
+
+
+
+                

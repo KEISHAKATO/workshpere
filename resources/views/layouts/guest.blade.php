@@ -19,7 +19,8 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center p-6">
             <div class="mb-6">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 text-primary" />
+                    <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-48 w-48">
+                    <!-- <span class="font-semibold">Worksphere</span> -->
                 </a>
             </div>
 

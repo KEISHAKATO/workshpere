@@ -189,9 +189,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <a href="{{ url('/') }}" class="flex items-center gap-2">
-                <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-32 w-32">
-                <!-- <span class="font-semibold">Worksphere</span> -->
-            </a>
+                    <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-32 w-32">
+                    <!-- <span class="font-semibold">Worksphere</span> -->
+                </a>
                 
                 <span class="opacity-70">© {{ date('Y') }}</span>
             </div>

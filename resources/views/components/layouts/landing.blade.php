@@ -14,7 +14,7 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between gap-4 py-2">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 font-semibold">
-                    <x-application-logo class="h-6 w-6" />
+                    <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-48 w-48">
                     <span>{{ config('app.name', 'Worksphere') }}</span>
                 </a>
 
