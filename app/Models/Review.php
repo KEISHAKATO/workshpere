@@ -3,14 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Review extends Model
 {
-    protected $guarded = [];
+    use HasFactory;
 
-    public function job()
+    protected $fillable = [
+        'application_id',
+        'reviewer_id',
+        'reviewee_id',
+        'reviewer_role',
+        'rating',
+        'title',
+        'comment',
+    ];
+
+    public function application()
     {
-        return $this->belongsTo(Job::class);
+        return $this->belongsTo(Application::class);
     }
 
     public function reviewer()

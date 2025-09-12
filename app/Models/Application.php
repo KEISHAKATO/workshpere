@@ -20,4 +20,10 @@ class Application extends Model
     {
         return $this->belongsTo(User::class, 'seeker_id');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
 }

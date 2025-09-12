@@ -46,4 +46,19 @@ class User extends Authenticatable
     public function applications()     { return $this->hasMany(Application::class, 'seeker_id'); }
     public function messagesSent()     { return $this->hasMany(Message::class, 'sender_id'); }
     public function messagesReceived() { return $this->hasMany(Message::class, 'receiver_id'); }
+    public function reviewsGiven()
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'reviewee_id');
+    }
+
+    public function getAvgRatingAttribute(): ?float
+    {
+        $avg = $this->reviewsReceived()->avg('rating');
+        return $avg ? round((float)$avg, 1) : null;
+    }
 }

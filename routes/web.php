@@ -34,6 +34,9 @@ use App\Http\Controllers\DashboardController;
 // Chatbot webhook (BotMan)
 use App\Http\Controllers\BotManController;
 
+// Review
+use App\Http\Controllers\ReviewController;
+
 
 
 /*
@@ -44,6 +47,14 @@ Route::get('/jobs', [PublicJobsController::class, 'index'])->name('public.jobs.i
 Route::get('/jobs/{job}', [PublicJobsController::class, 'show'])->name('public.jobs.show');
 Route::match(['GET','POST'], '/botman', [BotManController::class, 'handle'])
     ->name('botman.handle');
+
+Route::post('/ui/theme', function (\Illuminate\Http\Request $request) {
+    $theme = $request->input('theme', 'worksphere');
+    $allowed = ['worksphere','light','dark','corporate','business','lofi','cupcake','emerald','synthwave'];
+    if (!in_array($theme, $allowed, true)) $theme = 'worksphere';
+    session(['ui.theme' => $theme]);
+    return back();
+})->name('ui.theme');
 
 /*
 | Dashboard (EnsureUserIsActive is applied globally via Kernel's web group)
@@ -119,9 +130,14 @@ Route::middleware(['auth'])->group(function () {
     | Messaging (both roles)
     */
     Route::get('/jobs/{job}/chat', [MessageController::class, 'index'])->name('chat.show');
+    Route::post('/jobs/{job}/chat', [MessageController::class, 'store'])
+        ->name('messages.store');
     Route::get('/jobs/{job}/messages', [MessageController::class, 'fetch'])->name('chat.fetch');
     Route::post('/jobs/{job}/messages', [MessageController::class, 'store'])->name('chat.store');
 
+    // Reviews
+    Route::post('/applications/{application}/reviews', [ReviewController::class, 'store'])
+        ->name('applications.reviews.store');
     /*
     | Admin
     */
@@ -149,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
             // Reports
             Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');
             Route::get('reports/data', [ReportsController::class, 'data'])->name('reports.data');
+
         });
 });
 

@@ -3,121 +3,107 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="font-semibold text-xl">My Applications</h2>
-                <p class="text-sm text-gray-600">Track the status of your job applications.</p>
+                <p class="text-sm opacity-70">Track the status of your job applications.</p>
             </div>
-            <a href="{{ route('seeker.jobs.index') }}" class="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200">
-                Browse Jobs
-            </a>
+            <a href="{{ route('seeker.jobs.index') }}" class="btn">Browse Jobs</a>
         </div>
     </x-slot>
 
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto p-4">
         @if (session('status'))
-            <div class="mb-4 p-3 bg-green-50 text-green-700 rounded">{{ session('status') }}</div>
+            <div class="alert alert-success mb-4"><span>{{ session('status') }}</span></div>
         @endif
 
         @if($apps->isEmpty())
-            <div class="bg-white rounded-xl shadow p-6 text-gray-600">
-                You haven’t applied to any jobs yet.
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body text-base-content/70">You haven’t applied to any jobs yet.</div>
             </div>
         @else
-            <div class="bg-white rounded-xl shadow overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <tr>
-                            <th class="px-6 py-3">Job</th>
-                            <th class="px-6 py-3">Location</th>
-                            <th class="px-6 py-3">Type</th>
-                            <th class="px-6 py-3">Applied</th>
-                            <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @foreach($apps as $app)
-                            @php
-                                $job = $app->job;
-                                $statusBg = $app->status === 'accepted'
-                                    ? 'bg-green-600'
-                                    : ($app->status === 'rejected' ? 'bg-red-600' : 'bg-gray-600');
-                            @endphp
-                            <tr class="text-sm">
-                                <td class="px-6 py-4">
-                                    <div class="font-medium text-gray-900">
-                                        <a class="hover:underline" href="{{ route('public.jobs.show', $job) }}">
-                                            {{ $job->title }}
-                                        </a>
-                                    </div>
-                                    @if($job->pay_min || $job->pay_max)
-                                        <div class="text-gray-500">
-                                            {{ $job->currency ?? 'KES' }}
-                                            {{ $job->pay_min ? number_format($job->pay_min) : '—' }} –
-                                            {{ $job->pay_max ? number_format($job->pay_max) : '—' }}
-                                        </div>
-                                    @endif
-                                </td>
-
-                                <td class="px-6 py-4 text-gray-700">
-                                    {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
-                                </td>
-
-                                <td class="px-6 py-4 text-gray-700">
-                                    {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
-                                </td>
-
-                                <td class="px-6 py-4 text-gray-600">
-                                    {{ optional($app->created_at)->toDayDateTimeString() }}
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium text-white {{ $statusBg }}">
-                                        {{ ucfirst($app->status) }}
-                                    </span>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <div class="flex justify-end gap-2">
-                                        <a href="{{ route('public.jobs.show', $job) }}"
-                                        class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
-                                            View Job
-                                        </a>
-
-                                        {{-- Chat --}}
-                                        @php
-                                            $badge = $unreadByJob[$job->id] ?? 0;
-                                        @endphp
-                                        <a href="{{ route('chat.show', $job) }}"
-                                        class="relative px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200">
-                                            Chat
-                                            @if($badge > 0)
-                                                <span class="absolute -top-2 -right-2 inline-flex items-center justify-center
-                                                            text-[10px] font-semibold text-white bg-red-600 rounded-full
-                                                            h-5 min-w-[20px] px-1">
-                                                    {{ $badge }}
-                                                </span>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-0">
+                    <div class="overflow-x-auto">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Job</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Applied</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($apps as $app)
+                                    @php
+                                        $job = $app->job;
+                                        $statusClass = $app->status === 'accepted'
+                                            ? 'badge-success'
+                                            : ($app->status === 'rejected' ? 'badge-error' : 'badge-ghost');
+                                    @endphp
+                                    <tr class="text-sm">
+                                        <td>
+                                            <div class="font-medium">
+                                                <a class="link link-primary" href="{{ route('public.jobs.show', $job) }}">
+                                                    {{ $job->title }}
+                                                </a>
+                                            </div>
+                                            @if($job->pay_min || $job->pay_max)
+                                                <div class="text-xs opacity-70">
+                                                    {{ $job->currency ?? 'KES' }}
+                                                    {{ $job->pay_min ? number_format($job->pay_min) : '—' }} –
+                                                    {{ $job->pay_max ? number_format($job->pay_max) : '—' }}
+                                                </div>
                                             @endif
-                                        </a>
+                                        </td>
+                                        <td class="text-base-content/80">
+                                            {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
+                                        </td>
+                                        <td class="text-base-content/80">
+                                            {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
+                                        </td>
+                                        <td class="text-base-content/70">
+                                            {{ optional($app->created_at)->toDayDateTimeString() }}
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ $statusClass }}">{{ ucfirst($app->status) }}</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <div class="flex justify-end gap-2">
+                                                <a href="{{ route('public.jobs.show', $job) }}" class="btn btn-sm btn-primary">View Job</a>
 
-                                        @if($app->status === 'pending')
-                                            <form method="POST" action="{{ route('seeker.applications.destroy', $app) }}"
-                                                onsubmit="return confirm('Withdraw this application?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="px-3 py-1.5 rounded bg-gray-600 text-white hover:bg-gray-700">
-                                                    Withdraw
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
+                                                @php $badge = $unreadByJob[$job->id] ?? 0; @endphp
+                                                <a href="{{ route('chat.show', $job) }}" class="btn btn-sm">
+                                                    Chat
+                                                    @if($badge > 0)
+                                                        <span class="badge badge-error ml-2">{{ $badge }}</span>
+                                                    @endif
+                                                </a>
 
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                                @if($app->status === 'pending')
+                                                    <form method="POST" action="{{ route('seeker.applications.destroy', $app) }}"
+                                                          onsubmit="return confirm('Withdraw this application?');">
+                                                        @csrf @method('DELETE')
+                                                        <button class="btn btn-sm">Withdraw</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                <div class="px-6 py-4 border-t">
-                    {{ $apps->links() }}
+                                    @if(in_array($app->status, ['accepted','completed'], true))
+                                        <tr class="bg-base-200/60">
+                                            <td colspan="6" class="px-6 py-4">
+                                                <x-review-form :application="$app" />
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-4">{{ $apps->links() }}</div>
                 </div>
             </div>
         @endif

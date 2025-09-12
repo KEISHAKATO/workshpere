@@ -2,76 +2,72 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Reports & Analytics</h2>
-                <p class="text-sm text-gray-600 mt-1">Jobs, applications, and skills insights</p>
+                <h2 class="font-semibold text-xl">Reports &amp; Analytics</h2>
+                <p class="text-sm opacity-70 mt-1">Jobs, applications, and skills insights</p>
             </div>
         </div>
     </x-slot>
 
-    {{-- Prevent browser from restoring scroll on navigation to this page --}}
-    <script>
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-    </script>
+    <script> if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } </script>
 
-    {{-- Keep charts from stretching + avoid layout shift --}}
     <style>
         .chart-card { position: relative; }
-        .chart-box  { position: relative; height: 260px; }          /* default */
-        @media (min-width: 768px) { .chart-box { height: 300px; } }  /* md+ */
-        @media (min-width: 1024px){ .chart-box { height: 320px; } }  /* lg+ */
+        .chart-box  { position: relative; height: 260px; }
+        @media (min-width: 768px) { .chart-box { height: 300px; } }
+        @media (min-width: 1024px){ .chart-box { height: 320px; } }
     </style>
 
-    <div class="max-w-7xl mx-auto p-6 space-y-8">
-        {{-- KPI strip --}}
+    <div class="max-w-7xl mx-auto p-4 space-y-8">
+        {{-- KPIs --}}
         <div id="kpis" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white rounded-xl shadow p-5">
-                <div class="text-sm text-gray-500">Acceptance Rate</div>
-                <div class="text-3xl font-bold mt-1"><span id="kpi-acceptance">—</span>%</div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="opacity-70 text-sm">Acceptance Rate</div>
+                    <div class="text-3xl font-bold mt-1"><span id="kpi-acceptance">—</span>%</div>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow p-5">
-                <div class="text-sm text-gray-500">Applications (Accepted)</div>
-                <div class="text-3xl font-bold mt-1"><span id="kpi-acc">—</span></div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="opacity-70 text-sm">Applications (Accepted)</div>
+                    <div class="text-3xl font-bold mt-1"><span id="kpi-acc">—</span></div>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow p-5">
-                <div class="text-sm text-gray-500">Applications (Pending)</div>
-                <div class="text-3xl font-bold mt-1"><span id="kpi-pend">—</span></div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="opacity-70 text-sm">Applications (Pending)</div>
+                    <div class="text-3xl font-bold mt-1"><span id="kpi-pend">—</span></div>
+                </div>
             </div>
         </div>
 
         {{-- Charts --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow p-5 chart-card">
-                <h3 class="font-semibold mb-3">Jobs by Category</h3>
-                <div class="chart-box">
-                    <canvas id="chart-jobs-category" aria-label="Jobs by Category"></canvas>
+            <div class="card bg-base-100 shadow-xl chart-card">
+                <div class="card-body">
+                    <h3 class="font-semibold">Jobs by Category</h3>
+                    <div class="chart-box"><canvas id="chart-jobs-category"></canvas></div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-xl shadow p-5 chart-card">
-                <h3 class="font-semibold mb-3">Jobs by County (Top 12)</h3>
-                <div class="chart-box">
-                    <canvas id="chart-jobs-county" aria-label="Jobs by County"></canvas>
+            <div class="card bg-base-100 shadow-xl chart-card">
+                <div class="card-body">
+                    <h3 class="font-semibold">Jobs by County (Top 12)</h3>
+                    <div class="chart-box"><canvas id="chart-jobs-county"></canvas></div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-xl shadow p-5 chart-card">
-                <h3 class="font-semibold mb-3">Applications Status</h3>
-                <div class="chart-box">
-                    <canvas id="chart-apps-status" aria-label="Applications Status"></canvas>
+            <div class="card bg-base-100 shadow-xl chart-card">
+                <div class="card-body">
+                    <h3 class="font-semibold">Applications Status</h3>
+                    <div class="chart-box"><canvas id="chart-apps-status"></canvas></div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-xl shadow p-5 chart-card">
-                <h3 class="font-semibold mb-3">Skills: In-Demand vs Available (Top 12)</h3>
-                <div class="chart-box">
-                    <canvas id="chart-skills" aria-label="Skills Demand vs Supply"></canvas>
+            <div class="card bg-base-100 shadow-xl chart-card">
+                <div class="card-body">
+                    <h3 class="font-semibold">Skills: In-Demand vs Available (Top 12)</h3>
+                    <div class="chart-box"><canvas id="chart-skills"></canvas></div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Page-scoped JS bundle --}}
     @vite('resources/js/reports.js')
 </x-app-layout>

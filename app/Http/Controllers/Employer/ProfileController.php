@@ -9,8 +9,19 @@ class ProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        $profile = $request->user()->profile()->firstOrCreate([]);
-        return view('employer.profile.edit', compact('profile'));
+        $user    = $request->user();
+        $profile = $user->profile()->firstOrCreate([]);
+
+        // Reviews received by this employer (from seekers)
+        $reviews = $user->reviewsReceived()
+            ->with('reviewer:id,name')
+            ->latest()
+            ->paginate(5, ['*'], 'reviews_page');
+
+        $avgRating    = $user->avg_rating; // accessor on User
+        $reviewsCount = $user->reviewsReceived()->count();
+
+        return view('employer.profile.edit', compact('profile', 'reviews', 'avgRating', 'reviewsCount'));
     }
 
     public function update(Request $request)

@@ -1,96 +1,136 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800">Company Profile (Employer)</h2>
+        <h2 class="font-semibold text-xl">Company Profile (Employer)</h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
-        @if (session('status'))
-            <div class="mb-4 p-3 bg-green-50 text-green-700 rounded">{{ session('status') }}</div>
-        @endif
+    <div class="max-w-3xl mx-auto p-4">
 
-        <form method="POST" action="{{ route('employer.profile.update') }}" class="space-y-6">
-            @csrf
-            @method('PATCH')
 
-            {{-- Company name --}}
-            <div>
-                <label for="company_name" class="block text-sm font-medium">Company Name</label>
-                <input id="company_name" name="company_name" class="mt-1 w-full border rounded p-2"
-                       value="{{ old('company_name', $profile->company_name) }}" required>
-                @error('company_name') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-            </div>
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <form method="POST" action="{{ route('employer.profile.update') }}" class="grid grid-cols-1 gap-5">
+                    @csrf
+                    @method('PATCH')
 
-            {{-- Website --}}
-            <div>
-                <label for="website" class="block text-sm font-medium">Website</label>
-                <input id="website" type="url" name="website" class="mt-1 w-full border rounded p-2"
-                       value="{{ old('website', $profile->website) }}" placeholder="https://example.com">
-                @error('website') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-            </div>
+                    {{-- Company name --}}
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Company Name</span></label>
+                        <input id="company_name" name="company_name" class="input input-bordered"
+                               value="{{ old('company_name', $profile->company_name) }}" required>
+                        <x-input-error :messages="$errors->get('company_name')" class="mt-1" />
+                    </div>
 
-            {{-- About --}}
-            <div>
-                <label for="about" class="block text-sm font-medium">About</label>
-                <textarea id="about" name="about" class="mt-1 w-full border rounded p-2" rows="4"
-                          placeholder="Describe your company and the kind of talent you hire.">{{ old('about', $profile->about) }}</textarea>
-                @error('about') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-            </div>
+                    {{-- Website --}}
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Website</span></label>
+                        <input id="website" type="url" name="website" class="input input-bordered"
+                               value="{{ old('website', $profile->website) }}" placeholder="https://example.com">
+                        <x-input-error :messages="$errors->get('website')" class="mt-1" />
+                    </div>
 
-            {{-- Location (single search field) --}}
-            <div>
-                <label for="emp-location" class="block text-sm font-medium">Location (search)</label>
-                <input id="emp-location"
-                       type="text"
-                       class="mt-1 w-full border rounded p-2"
-                       placeholder="Start typing a city, county, address…"
-                       data-gmaps="autocomplete"
-                       data-country="ke"
-                       data-target-city="[name='location_city']"
-                       data-target-county="[name='location_county']"
-                       data-target-lat="[name='lat']"
-                       data-target-lng="[name='lng']"
-                       autocomplete="off">
-                <p class="text-xs text-gray-500 mt-1">Pick a suggestion to save City/County and coordinates.</p>
-            </div>
+                    {{-- About --}}
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">About</span></label>
+                        <textarea id="about" name="about" class="textarea textarea-bordered" rows="5"
+                                  placeholder="Describe your company and the kind of talent you hire.">{{ old('about', $profile->about) }}</textarea>
+                        <x-input-error :messages="$errors->get('about')" class="mt-1" />
+                    </div>
 
-            {{-- Hidden fields populated by autocomplete --}}
-            <input type="hidden" name="location_city"   value="{{ old('location_city', $profile->location_city) }}">
-            <input type="hidden" name="location_county" value="{{ old('location_county', $profile->location_county) }}">
-            <input type="hidden" name="lat"             value="{{ old('lat', $profile->lat) }}">
-            <input type="hidden" name="lng"             value="{{ old('lng', $profile->lng) }}">
+                    {{-- Location (single search field) --}}
+                    <div class="form-control">
+                        <label for="emp-location" class="label"><span class="label-text">Location (search)</span></label>
+                        <input id="emp-location" type="text" class="input input-bordered"
+                               placeholder="Start typing a city, county, address…"
+                               data-gmaps="autocomplete"
+                               data-country="ke"
+                               data-target-city="[name='location_city']"
+                               data-target-county="[name='location_county']"
+                               data-target-lat="[name='lat']"
+                               data-target-lng="[name='lng']"
+                               autocomplete="off">
+                        <label class="label"><span class="label-text-alt">Pick a suggestion to save City/County and coordinates.</span></label>
+                    </div>
 
-            {{-- Saved Location (read-only summary) --}}
-            <div class="rounded-lg border p-4 bg-gray-50">
-                <div class="text-sm font-medium text-gray-700 mb-2">Saved location</div>
+                    {{-- Hidden fields populated by autocomplete --}}
+                    <input type="hidden" name="location_city"   value="{{ old('location_city', $profile->location_city) }}">
+                    <input type="hidden" name="location_county" value="{{ old('location_county', $profile->location_county) }}">
+                    <input type="hidden" name="lat"             value="{{ old('lat', $profile->lat) }}">
+                    <input type="hidden" name="lng"             value="{{ old('lng', $profile->lng) }}">
+
+                    {{-- Saved Location (summary) --}}
+                    @php
+                        $hasLocation = $profile->location_city || $profile->location_county || $profile->lat || $profile->lng;
+                    @endphp
+                    <div class="alert">
+                        <div>
+                            <div class="font-medium">Saved location</div>
+                            @if($hasLocation)
+                                <dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-sm mt-2">
+                                    <div><dt class="opacity-70">City</dt><dd class="font-medium">{{ $profile->location_city ?? '—' }}</dd></div>
+                                    <div><dt class="opacity-70">County</dt><dd class="font-medium">{{ $profile->location_county ?? '—' }}</dd></div>
+                                    <div><dt class="opacity-70">Latitude</dt><dd class="font-medium">{{ $profile->lat ?? '—' }}</dd></div>
+                                    <div><dt class="opacity-70">Longitude</dt><dd class="font-medium">{{ $profile->lng ?? '—' }}</dd></div>
+                                </dl>
+                            @else
+                                <p class="text-sm opacity-70 mt-1">No location saved yet. Use the search box above and save.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="form-control">
+                        <button class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+
+                {{-- Reviews & Ratings --}}
+                <div class="divider my-6">Reviews</div>
                 @php
-                    $hasLocation = $profile->location_city || $profile->location_county || $profile->lat || $profile->lng;
+                    $full = (int) floor($avgRating ?? 0);
+                    $empty = 5 - $full;
                 @endphp
 
-                @if($hasLocation)
-                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
-                        <div>
-                            <dt class="text-gray-500">City</dt>
-                            <dd class="font-medium text-gray-900">{{ $profile->location_city ?? '—' }}</dd>
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="rating rating-sm">
+                        {!! str_repeat('<input type="radio" class="mask mask-star-2 bg-amber-400" checked />', $full) !!}
+                        {!! str_repeat('<input type="radio" class="mask mask-star-2" />', $empty) !!}
+                    </div>
+                    <div class="text-sm opacity-70">
+                        @if($reviewsCount > 0)
+                            {{ number_format($avgRating ?? 0, 1) }} / 5 • {{ $reviewsCount }} review{{ $reviewsCount === 1 ? '' : 's' }}
+                        @else
+                            No reviews yet
+                        @endif
+                    </div>
+                </div>
+
+                @forelse($reviews as $rev)
+                    @php
+                        $rFull = (int) $rev->rating;
+                        $rEmpty = 5 - $rFull;
+                    @endphp
+                    <div class="bg-base-200 rounded-xl p-4 mb-3">
+                        <div class="flex items-center justify-between">
+                            <div class="font-medium">{{ $rev->title ?: 'Review' }}</div>
+                            <div class="rating rating-xs">
+                                {!! str_repeat('<input type="radio" class="mask mask-star-2 bg-amber-400" checked />', $rFull) !!}
+                                {!! str_repeat('<input type="radio" class="mask mask-star-2" />', $rEmpty) !!}
+                            </div>
                         </div>
-                        <div>
-                            <dt class="text-gray-500">County</dt>
-                            <dd class="font-medium text-gray-900">{{ $profile->location_county ?? '—' }}</dd>
+                        @if($rev->comment)
+                            <p class="mt-2">{{ $rev->comment }}</p>
+                        @endif
+                        <div class="mt-2 text-xs opacity-70">
+                            by {{ $rev->reviewer->name ?? '—' }} • {{ optional($rev->created_at)->diffForHumans() }}
                         </div>
-                        <div>
-                            <dt class="text-gray-500">Latitude</dt>
-                            <dd class="font-medium text-gray-900">{{ $profile->lat ?? '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">Longitude</dt>
-                            <dd class="font-medium text-gray-900">{{ $profile->lng ?? '—' }}</dd>
-                        </div>
-                    </dl>
-                @else
-                    <p class="text-sm text-gray-500">No location saved yet. Use the search box above and save.</p>
+                    </div>
+                @empty
+                    <p class="opacity-70">No reviews yet.</p>
+                @endforelse
+
+                @if($reviews->hasPages())
+                    <div class="mt-2">{{ $reviews->links() }}</div>
                 @endif
             </div>
-
-            <button class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        </form>
+        </div>
     </div>
 </x-app-layout>

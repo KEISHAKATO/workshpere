@@ -1,59 +1,124 @@
-{{-- resources/views/layouts/navigation.blade.php --}}
-<nav class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between">
-            <div class="flex items-center gap-6">
-                <a href="{{ url('/') }}" class="text-lg font-semibold">WORKSPHERE</a>
+@php
+    /** @var \App\Models\User|null $user */
+    $user = auth()->user();
+    $currentTheme = session('ui.theme', 'worksphere');
+    $themes = [
+        'worksphere' => 'Worksphere',
+        'light'      => 'Light',
+        'dark'       => 'Dark',
+        'business'   => 'Business',
+        'corporate'  => 'Corporate',
+        'emerald'    => 'Emerald',
+        'cupcake'    => 'Cupcake',
+        'lofi'       => 'Lofi',
+        'synthwave'  => 'Synthwave',
+    ];
+@endphp
 
-                <a href="{{ route('public.jobs.index') }}" class="text-gray-700 hover:text-gray-900">Jobs</a>
+<div class="navbar bg-base-100 border-b border-base-300">
+    <div class="flex-1">
+        {{-- Drawer toggle (mobile) --}}
+        <label for="ws-drawer" class="btn btn-ghost lg:hidden" aria-label="open sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </label>
 
-                @auth
-                    <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">Dashboard</a>
-
-                    {{-- Seeker-only --}}
-                    @if(auth()->user()->isSeeker())
-                        <a href="{{ route('seeker.jobs.index') }}" class="text-gray-700 hover:text-gray-900">Browse Jobs</a>
-                        <a href="{{ route('seeker.profile.edit') }}" class="text-gray-700 hover:text-gray-900">My Profile</a>
-                        <a href="{{ route('seeker.applications.index') }}" class="text-gray-700 hover:text-gray-900">My Applications</a>
-                    @endif
-
-                    {{-- Employer-only --}}
-                    @if(auth()->user()->isEmployer())
-                        <a href="{{ route('employer.job_posts.index') }}" class="text-gray-700 hover:text-gray-900">My Job Posts</a>
-                        <a href="{{ route('employer.job_posts.create') }}" class="text-gray-700 hover:text-gray-900">Post a Job</a>
-                        <a href="{{ route('employer.profile.edit') }}" class="text-gray-700 hover:text-gray-900">Company Profile</a>
-                    @endif
-
-                    {{-- Admin-only --}}
-                    @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.users.index') }}" class="text-gray-700 hover:text-gray-900">Users</a>
-                        <a href="{{ route('admin.jobs.index') }}" class="text-gray-700 hover:text-gray-900">Jobs</a>
-                        <a href="{{ route('admin.applications.index') }}" class="text-gray-700 hover:text-gray-900">Applications</a>
-                        <a href="{{ route('admin.reports.index') }}" class="text-gray-700 hover:text-gray-900">Reports</a> {{-- ✅ fixed --}}
-                    @endif
-                @endauth
-            </div>
-
-            <div class="flex items-center gap-4">
-                @guest
-                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">Log in</a>
-                    <a href="{{ route('register') }}" class="text-gray-700 hover:text-gray-900">Register</a>
-                    <a href="#" onclick="if(window.BotManWidget){ BotManWidget.open(); } return false;">
-                    Chat Support
-                    </a>
-
-                @endguest
-
-                @auth
-                    <span class="hidden sm:inline text-sm text-gray-600">
-                        {{ auth()->user()->name }} • {{ ucfirst(auth()->user()->role) }}
-                    </span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button class="text-red-600 hover:text-red-700">Log out</button>
-                    </form>
-                @endauth
-            </div>
-        </div>
+        {{-- Brand --}}
+        <a href="{{ url('/') }}" class="btn btn-ghost text-lg font-semibold">Dashboard</a>
     </div>
-</nav>
+
+    <div class="flex-none gap-2">
+        {{-- Theme switcher --}}
+        <details class="dropdown dropdown-end">
+            <summary class="btn btn-ghost normal-case">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21.64 13A9 9 0 1111 2.36a7 7 0 1010.64 10.64z"/>
+                </svg>
+                Theme
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 opacity-70" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 9l6 6 6-6"/>
+                </svg>
+            </summary>
+            <ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-2 w-56 p-2 shadow">
+                @foreach($themes as $value => $label)
+                    <li>
+                        <form method="POST" action="{{ route('ui.theme') }}">
+                            @csrf
+                            <input type="hidden" name="theme" value="{{ $value }}">
+                            <button type="submit" class="{{ $currentTheme === $value ? 'active font-semibold' : '' }}">
+                                {{ $label }}
+                            </button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </details>
+
+        {{-- Account / Auth --}}
+        @auth
+            <details class="dropdown dropdown-end">
+                <summary class="btn btn-ghost">
+                    <div class="flex items-center gap-2">
+                        <div class="avatar placeholder">
+                            <div class="bg-primary text-primary-content rounded-full w-8">
+                                <span class="text-sm">
+                                    {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($user?->name ?? 'U', 0, 1)) }}
+                                </span>
+                            </div>
+                        </div>
+                        <span class="hidden sm:inline text-sm">{{ $user?->name }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                </summary>
+                <ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-2 w-56 p-2 shadow">
+                    <li class="menu-title">Signed in</li>
+                    <li><span class="truncate px-3 text-xs text-base-content/70">{{ $user?->email }}</span></li>
+
+                    <li class="menu-title mt-2">Account</li>
+                    @php
+                        $settingsUrl = null;
+                        if ($user?->isSeeker() && \Illuminate\Support\Facades\Route::has('seeker.profile.edit')) {
+                            $settingsUrl = route('seeker.profile.edit');
+                        } elseif ($user?->isEmployer() && \Illuminate\Support\Facades\Route::has('employer.profile.edit')) {
+                            $settingsUrl = route('employer.profile.edit');
+                        }
+                    @endphp
+                    @if($settingsUrl)
+                        <li><a href="{{ $settingsUrl }}">Settings</a></li>
+                    @endif
+
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </details>
+        @endauth
+
+        @guest
+            <div class="flex items-center gap-2">
+                <a href="{{ route('login') }}" class="btn btn-ghost">Log in</a>
+                <a href="{{ route('register') }}" class="btn btn-primary">Sign up</a>
+            </div>
+        @endguest
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
+@endpush

@@ -53,7 +53,6 @@ class MessageController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        // ✅ Mark as read: all messages sent TO me from the other party in this thread
         Message::where('job_id', $job->id)
             ->where('receiver_id', $user->id)
             ->where('sender_id', $otherUserId)
@@ -69,7 +68,7 @@ class MessageController extends Controller
     }
 
     // Send a message
-    public function store(Request $request, Job $job)
+        public function store(Request $request, Job $job)
     {
         $user = $request->user();
 
@@ -102,14 +101,54 @@ class MessageController extends Controller
             'body'        => $data['body'],
         ]);
 
-        $params = [];
-        if ($isEmployer) {
-            $params['seeker_id'] = $receiverId;
-        }
+        $params = $isEmployer ? ['seeker_id' => $receiverId] : [];
 
-        return redirect()->route('chat.show', array_filter([$job] + $params))
-                         ->with('status', 'Message sent.');
+        return redirect()
+            ->route('chat.show', array_merge([$job], $params))
+            ->with('status', 'Message sent.');
     }
 
-    // (Fetch action unchanged)
+    // Optional JSON fetch endpoint if you want polling
+    public function fetch(Request $request, Job $job)
+    {
+        $user = $request->user();
+
+        $isEmployer = $user->id === (int) $job->employer_id;
+        $didApply   = Application::where('job_id', $job->id)
+                        ->where('seeker_id', $user->id)->exists();
+
+        if (! $isEmployer && ! $didApply) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $otherUserId = $isEmployer
+            ? (int) $request->query('seeker_id')
+            : (int) $job->employer_id;
+
+        if ($isEmployer && !$otherUserId) {
+            return response()->json(['messages' => []]);
+        }
+
+        $messages = Message::where('job_id', $job->id)
+            ->where(function ($q) use ($user, $otherUserId) {
+                $q->where(function ($q2) use ($user, $otherUserId) {
+                    $q2->where('sender_id', $user->id)->where('receiver_id', $otherUserId);
+                })->orWhere(function ($q2) use ($user, $otherUserId) {
+                    $q2->where('sender_id', $otherUserId)->where('receiver_id', $user->id);
+                });
+            })
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn($m) => [
+                'id' => $m->id,
+                'body' => $m->body,
+                'sender_id' => $m->sender_id,
+                'receiver_id' => $m->receiver_id,
+                'created_at' => optional($m->created_at)->toIso8601String(),
+            ]);
+
+        return response()->json(['messages' => $messages]);
+    }
 }
+
+

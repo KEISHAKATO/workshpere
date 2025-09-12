@@ -1,55 +1,77 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-semibold text-xl">Chat • {{ $job->title }}</h2>
-                @if($isEmployer && $otherUserId)
-                    <p class="text-sm text-gray-600">Chatting with seeker #{{ $otherUserId }}</p>
-                @endif
-            </div>
-            <a href="{{ url()->previous() }}" class="text-sm px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Back</a>
+            <h2 class="font-semibold text-xl">
+                Chat — {{ $job->title }}
+            </h2>
+            <a href="{{ url()->previous() }}" class="btn btn-sm">Back</a>
         </div>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto p-6 space-y-4">
-        @if(session('status'))
-            <div class="p-2 bg-green-50 text-green-700 rounded">{{ session('status') }}</div>
-        @endif
+    <div class="max-w-3xl mx-auto p-4">
+        
 
-        <div class="bg-white rounded-xl shadow p-4 max-h-[60vh] overflow-y-auto">
-            @forelse($messages as $m)
-                <div class="mb-3">
-                    <div class="text-xs text-gray-500">
-                        {{ $m->created_at->toDayDateTimeString() }} •
-                        @if($m->sender_id === auth()->id()) You @else User #{{ $m->sender_id }} @endif
-                        → User #{{ $m->receiver_id }}
-                    </div>
-                    <div class="mt-1 p-2 rounded {{ $m->sender_id === auth()->id() ? 'bg-blue-50' : 'bg-gray-50' }}">
-                        {{ $m->body }}
-                    </div>
+        {{-- If employer hasn’t picked a seeker yet --}}
+        @if ($isEmployer && empty($otherUserId))
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <h3 class="card-title">No applicant selected</h3>
+                    <p class="text-sm text-base-content/70">
+                        Pick an applicant from
+                        <a href="{{ route('employer.applications.index', $job) }}" class="link">Applications</a>
+                        to start a conversation.
+                    </p>
                 </div>
-            @empty
-                <p class="text-gray-500">No messages yet.</p>
-            @endforelse
-        </div>
+            </div>
+            @push('scripts') @endpush
+            @push('styles') @endpush
+            @once @endonce
+            @php /** nothing else to render **/ @endphp
+        @else
+            {{-- Thread --}}
+            <div class="card bg-base-100 shadow mb-4">
+                <div class="card-body space-y-3 max-h-[60vh] overflow-y-auto">
+                    @forelse ($messages as $m)
+                        @php $mine = auth()->id() === (int) $m->sender_id; @endphp
+                        <div class="chat {{ $mine ? 'chat-end' : 'chat-start' }}">
+                            <div class="chat-header text-xs opacity-70">
+                                {{ $mine ? 'You' : ($m->sender->name ?? 'User #'.$m->sender_id) }}
+                                <time class="ml-2">{{ optional($m->created_at)->toDayDateTimeString() }}</time>
+                            </div>
+                            <div class="chat-bubble">{{ $m->body }}</div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-base-content/70">No messages yet.</p>
+                    @endforelse
+                </div>
+            </div>
 
-        <form method="POST" action="{{ route('chat.store', $job) }}" class="bg-white rounded-xl shadow p-4 flex gap-2">
-            @csrf
-            @if($isEmployer)
-                {{-- Needed so employer message goes to the selected seeker --}}
-                <input type="hidden" name="seeker_id" value="{{ $otherUserId }}">
-            @endif
-            <input
-                name="body"
-                class="flex-1 border rounded p-2"
-                placeholder="Type your message…"
-                required
-            />
-            <button class="px-4 py-2 bg-blue-600 text-white rounded">Send</button>
-        </form>
+            {{-- Composer --}}
+            <form
+                method="POST"
+                action="{{ route('chat.store', $job) }}"
+                class="flex gap-2"
+            >
+                @csrf
+                @if($isEmployer)
+                    {{-- Employer must include who they’re talking to --}}
+                    <input type="hidden" name="seeker_id" value="{{ (int) $otherUserId }}">
+                @endif
 
-        @error('body')
-            <div class="text-red-600 text-sm">{{ $message }}</div>
-        @enderror
+                <input
+                    type="text"
+                    name="body"
+                    class="input input-bordered flex-1"
+                    placeholder="Type your message…"
+                    maxlength="5000"
+                    required
+                />
+                <button class="btn btn-primary">Send</button>
+            </form>
+
+            @error('body')
+            <p class="mt-2 text-error text-sm">{{ $message }}</p>
+            @enderror
+        @endif
     </div>
 </x-app-layout>

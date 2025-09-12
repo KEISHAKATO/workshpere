@@ -1,13 +1,12 @@
-{{-- resources/views/dashboard.blade.php --}}
 <x-app-layout>
     @php $user = auth()->user(); @endphp
 
     <x-slot name="header">
         <div>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl">
                 Dashboard – {{ ucfirst($user->role) }}
             </h2>
-            <p class="text-sm text-gray-600 mt-1">
+            <p class="text-sm opacity-70 mt-1">
                 @if($user->isSeeker())
                     Find and apply for jobs that match your skills.
                 @elseif($user->isEmployer())
@@ -22,9 +21,8 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-
-            {{-- Seeker section (ONLY seekers) --}}
+        <div class="max-w-7xl mx-auto px-4 space-y-8">
+            {{-- Seeker --}}
             @if($user->isSeeker())
                 @php
                     $myApplications = \App\Models\Application::where('seeker_id', $user->id)->count();
@@ -32,64 +30,70 @@
                     $openJobs       = \App\Models\Job::where('status','open')->count();
                 @endphp
 
-                <section class="bg-white shadow rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-4">For Job Seekers</h3>
+                <section class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">For Job Seekers</h3>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $openJobs }}</div>
-                            <div class="text-gray-600">Open Jobs</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Open Jobs</div>
+                                <div class="stat-value text-primary">{{ $openJobs }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">My Applications</div>
+                                <div class="stat-value">{{ $myApplications }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Pending Decisions</div>
+                                <div class="stat-value">{{ $pendingApps }}</div>
+                            </div>
                         </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $myApplications }}</div>
-                            <div class="text-gray-600">My Applications</div>
-                        </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $pendingApps }}</div>
-                            <div class="text-gray-600">Pending Decisions</div>
-                        </div>
-                    </div>
 
-                    <div class="mt-5 flex gap-3">
-                        <a href="{{ route('seeker.jobs.index') }}" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Browse Jobs</a>
-                        <a href="{{ route('seeker.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Profile</a>
+                        <div class="pt-2 flex gap-3">
+                            <a href="{{ route('seeker.jobs.index') }}" class="btn btn-primary">Browse Jobs</a>
+                            <a href="{{ route('seeker.profile.edit') }}" class="btn">Edit Profile</a>
+                        </div>
                     </div>
                 </section>
 
-                {{-- Recommended Jobs (if provided by controller) --}}
+                {{-- Recommendations --}}
                 @if(isset($seekerRecommendations) && $seekerRecommendations->isNotEmpty())
-                    <section class="bg-white shadow rounded-xl p-6">
-                        <h3 class="text-lg font-semibold mb-4">Recommended Jobs for You</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @foreach($seekerRecommendations as $rec)
-                                @php /** @var \App\Models\Job $job */ $job = $rec['job']; $score = $rec['score']; @endphp
-                                <a href="{{ route('public.jobs.show', $job) }}" class="block border rounded-xl p-4 hover:bg-gray-50">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <div class="font-semibold">{{ $job->title }}</div>
-                                            <div class="text-sm text-gray-600 mt-1">
-                                                {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
-                                                • {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
-                                            </div>
-                                            @if(is_array($job->required_skills) && count($job->required_skills))
-                                                <div class="mt-2 text-xs text-gray-500 line-clamp-1">
-                                                    Skills: {{ implode(', ', $job->required_skills) }}
+                    <section class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title">Recommended Jobs for You</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @foreach($seekerRecommendations as $rec)
+                                    @php /** @var \App\Models\Job $job */ $job = $rec['job']; $score = $rec['score']; @endphp
+                                    <a href="{{ route('public.jobs.show', $job) }}" class="card bg-base-200 hover:bg-base-300 transition">
+                                        <div class="card-body">
+                                            <div class="flex items-start justify-between">
+                                                <div>
+                                                    <div class="font-semibold">{{ $job->title }}</div>
+                                                    <div class="text-sm opacity-70 mt-1">
+                                                        {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
+                                                        • {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
+                                                    </div>
+                                                    @if(is_array($job->required_skills) && count($job->required_skills))
+                                                        <div class="mt-2 text-xs opacity-70 line-clamp-1">
+                                                            Skills: {{ implode(', ', $job->required_skills) }}
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                            @endif
+                                                <div class="text-right">
+                                                    <div class="text-xs uppercase opacity-60">Match</div>
+                                                    <div class="text-lg font-bold">{{ $score }}%</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="text-right">
-                                            <div class="text-xs uppercase text-gray-500">Match</div>
-                                            <div class="text-lg font-bold">{{ $score }}%</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            @endforeach
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     </section>
                 @endif
             @endif
 
-            {{-- Employer section (ONLY employers) --}}
+            {{-- Employer --}}
             @if($user->isEmployer())
                 @php
                     $myJobs             = \App\Models\Job::where('employer_id',$user->id)->count();
@@ -98,60 +102,64 @@
                         ->where('status','pending')->count();
                 @endphp
 
-                <section class="bg-white shadow rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-4">For Employers</h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $myJobs }}</div>
-                            <div class="text-gray-600">Total Job Posts</div>
+                <section class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">For Employers</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Total Job Posts</div>
+                                <div class="stat-value">{{ $myJobs }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Open Positions</div>
+                                <div class="stat-value text-primary">{{ $myOpenJobs }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Pending Applications</div>
+                                <div class="stat-value">{{ $incomingApplicants }}</div>
+                            </div>
                         </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $myOpenJobs }}</div>
-                            <div class="text-gray-600">Open Positions</div>
+                        <div class="pt-2 flex gap-3">
+                            <a href="{{ route('employer.job_posts.create') }}" class="btn btn-primary">Post a Job</a>
+                            <a href="{{ route('employer.job_posts.index') }}" class="btn">Manage Job Posts</a>
+                            <a href="{{ route('employer.profile.edit') }}" class="btn">Edit Company Profile</a>
                         </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $incomingApplicants }}</div>
-                            <div class="text-gray-600">Pending Applications</div>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 flex gap-3">
-                        <a href="{{ route('employer.job_posts.create') }}" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Post a Job</a>
-                        <a href="{{ route('employer.job_posts.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Job Posts</a>
-                        <a href="{{ route('employer.profile.edit') }}" class="px-4 py-2 rounded-lg bg-gray-100">Edit Company Profile</a>
                     </div>
                 </section>
 
-                {{-- Suggested Candidates (if provided by controller) --}}
+                {{-- Suggested Candidates (optional) --}}
                 @if(isset($employerSuggestions) && $employerSuggestions->isNotEmpty())
-                    <section class="bg-white shadow rounded-xl p-6">
-                        <h3 class="text-lg font-semibold mb-4">Suggested Candidates</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            @foreach($employerSuggestions as $row)
-                                @php /** @var \App\Models\Profile $p */ $p = $row['profile']; $best = $row['best_score']; @endphp
-                                <div class="border rounded-xl p-4">
-                                    <div class="font-semibold">{{ $p->user?->name ?? 'Seeker #'.$p->user_id }}</div>
-                                    <div class="text-sm text-gray-600">
-                                        {{ $p->location_city ?? '—' }}, {{ $p->location_county ?? '—' }}
-                                    </div>
-                                    @if(is_array($p->skills) && count($p->skills))
-                                        <div class="mt-2 text-xs text-gray-500 line-clamp-2">
-                                            Skills: {{ implode(', ', array_slice($p->skills, 0, 8)) }}
+                    <section class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title">Suggested Candidates</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                @foreach($employerSuggestions as $row)
+                                    @php /** @var \App\Models\Profile $p */ $p = $row['profile']; $best = $row['best_score']; @endphp
+                                    <div class="card bg-base-200">
+                                        <div class="card-body">
+                                            <div class="font-semibold">{{ $p->user?->name ?? 'Seeker #'.$p->user_id }}</div>
+                                            <div class="text-sm opacity-70">
+                                                {{ $p->location_city ?? '—' }}, {{ $p->location_county ?? '—' }}
+                                            </div>
+                                            @if(is_array($p->skills) && count($p->skills))
+                                                <div class="mt-2 text-xs opacity-70 line-clamp-2">
+                                                    Skills: {{ implode(', ', array_slice($p->skills, 0, 8)) }}
+                                                </div>
+                                            @endif
+                                            <div class="mt-3 text-right">
+                                                <span class="text-xs uppercase opacity-60">Match</span>
+                                                <span class="text-lg font-bold ml-1">{{ $best }}%</span>
+                                            </div>
                                         </div>
-                                    @endif
-                                    <div class="mt-3 text-right">
-                                        <span class="text-xs uppercase text-gray-500">Match</span>
-                                        <span class="text-lg font-bold ml-1">{{ $best }}%</span>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </section>
                 @endif
             @endif
 
-            {{-- Admin section (ONLY admins) --}}
+            {{-- Admin --}}
             @if($user->isAdmin())
                 @php
                     $userCount = \App\Models\User::count();
@@ -159,27 +167,34 @@
                     $appCount  = \App\Models\Application::count();
                 @endphp
 
-                <section class="bg-white shadow rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-4">Admin Overview</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $userCount }}</div>
-                            <div class="text-gray-600">Users</div>
+                <section class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">Admin Overview</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Users</div>
+                                <div class="stat-value">{{ $userCount }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Jobs</div>
+                                <div class="stat-value">{{ $jobCount }}</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-box">
+                                <div class="stat-title">Applications</div>
+                                <div class="stat-value">{{ $appCount }}</div>
+                            </div>
+                            <a href="{{ route('admin.reports.index') }}" class="card bg-base-200 hover:bg-base-300 transition">
+                                <div class="card-body">
+                                    <div class="text-3xl">📊</div>
+                                    <div class="opacity-70">Reports</div>
+                                    <div class="mt-2 text-sm opacity-60">Charts &amp; KPIs</div>
+                                </div>
+                            </a>
                         </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $jobCount }}</div>
-                            <div class="text-gray-600">Jobs</div>
+                        <div class="pt-3">
+                            <a href="{{ route('admin.users.index') }}" class="btn">Manage Users</a>
+                            <a href="{{ route('admin.reports.index') }}" class="btn btn-primary ml-2">Open Reports</a>
                         </div>
-                        <div class="border rounded-lg p-4">
-                            <div class="text-3xl font-bold">{{ $appCount }}</div>
-                            <div class="text-gray-600">Applications</div>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 flex gap-3">
-                        <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Users</a>
-                        <a href="{{ route('admin.jobs.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Jobs</a>
-                        <a href="{{ route('admin.applications.index') }}" class="px-4 py-2 rounded-lg bg-gray-100">Manage Applications</a>
                     </div>
                 </section>
             @endif

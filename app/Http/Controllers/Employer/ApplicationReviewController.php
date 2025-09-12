@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Employer;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\Application;
-use App\Models\Message;   // ✅ Correct: import the Eloquent model, not a controller
+use App\Models\Message;   
 use Illuminate\Http\Request;
 
 class ApplicationReviewController extends Controller
@@ -19,7 +19,9 @@ class ApplicationReviewController extends Controller
         $applications = Application::with(['seeker:id,name,email'])
             ->where('job_id', $job->id)
             ->latest()
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
+
 
         // Unread messages for each seeker thread (employer is the receiver)
         $unreadBySeeker = Message::query()

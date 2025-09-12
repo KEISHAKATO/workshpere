@@ -1,72 +1,43 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl">Browse Jobs</h2>
-    </x-slot>
+    <x-slot name="header"><h2 class="font-semibold text-xl">Jobs</h2></x-slot>
 
-    <div class="max-w-6xl mx-auto p-6">
-        {{-- Filter form --}}
-        <form method="GET" class="mb-4 grid grid-cols-1 md:grid-cols-6 gap-3">
-            <input name="search" value="{{ request('search') }}" class="border rounded p-2" placeholder="Keyword or skill">
-            <input name="county" value="{{ request('county') }}" class="border rounded p-2" placeholder="County">
-            <select name="job_type" class="border rounded p-2">
-                <option value="">Any type</option>
-                @foreach(['full_time'=>'Full time','part_time'=>'Part time','gig'=>'Gig','contract'=>'Contract'] as $val=>$label)
-                    <option value="{{ $val }}" @selected(request('job_type')===$val)>{{ $label }}</option>
-                @endforeach
-            </select>
-            <input name="min_pay" type="number" min="0" value="{{ request('min_pay') }}" class="border rounded p-2" placeholder="Min pay">
-            <input name="max_pay" type="number" min="0" value="{{ request('max_pay') }}" class="border rounded p-2" placeholder="Max pay">
-            <select name="sort" class="border rounded p-2">
-                <option value="newest"   @selected(request('sort')==='newest')>Newest</option>
-                <option value="oldest"   @selected(request('sort')==='oldest')>Oldest</option>
-                <option value="pay_high" @selected(request('sort')==='pay_high')>Highest pay</option>
-                <option value="pay_low"  @selected(request('sort')==='pay_low')>Lowest pay</option>
-            </select>
-            <div class="md:col-span-6 flex gap-2">
-                <button class="bg-blue-600 text-white rounded px-4">Filter</button>
-                <a href="{{ route('public.jobs.index') }}" class="text-sm text-gray-600 underline">Reset</a>
-            </div>
-        </form>
-
-        {{-- Job cards --}}
-        @forelse($jobs as $job)
-            <a href="{{ route('public.jobs.show', $job) }}"
-               class="block bg-white rounded-xl shadow p-4 mb-4 hover:bg-gray-50">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold">{{ $job->title }}</h3>
-                        <p class="text-gray-600 mt-1 line-clamp-2">{{ Str::limit($job->description, 160) }}</p>
-                        <div class="text-sm text-gray-500 mt-2">
-                            {{ $job->location_city ?? '—' }}, {{ $job->location_county ?? '—' }}
-                            • {{ ucfirst(str_replace('_',' ', $job->job_type)) }}
-                            @if(is_array($job->required_skills))
-                                • Skills: {{ implode(', ', $job->required_skills) }}
-                            @endif
-                        </div>
+    <div class="max-w-6xl mx-auto p-4">
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <form method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
+                    <input name="q" class="input input-bordered" value="{{ request('q') }}" placeholder="Search title/desc/category">
+                    <input name="skills" class="input input-bordered" value="{{ request('skills') }}" placeholder="Skills">
+                    <input name="county" class="input input-bordered" value="{{ request('county') }}" placeholder="County">
+                    <div class="sm:col-span-3">
+                        <button class="btn">Filter</button>
+                        <a href="{{ route('public.jobs.index') }}" class="btn btn-ghost ml-2">Reset</a>
                     </div>
-                    <div class="text-right text-sm text-gray-500">
-                        @if($job->pay_min || $job->pay_max)
-                            <div class="font-medium text-gray-700">
-                                {{ $job->currency ?? 'KES' }}
-                                {{ $job->pay_min ? number_format($job->pay_min) : '—' }}
-                                –
-                                {{ $job->pay_max ? number_format($job->pay_max) : '—' }}
+                </form>
+
+                <div class="divider my-1"></div>
+
+                <div class="divide-y">
+                    @forelse($jobs as $job)
+                        <div class="py-4">
+                            <a href="{{ route('public.jobs.show', $job) }}" class="link link-primary text-lg font-semibold">{{ $job->title }}</a>
+                            <div class="text-sm opacity-70 mt-1">
+                                {{ ucfirst(str_replace('_',' ',$job->job_type)) }} • {{ $job->location_city }}, {{ $job->location_county }}
                             </div>
-                        @endif
-                        <div class="mt-1">
-                            Posted {{ optional($job->posted_at)->diffForHumans() ?? 'recently' }}
+                            @if(is_array($job->required_skills))
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach($job->required_skills as $s)
+                                        <span class="badge">{{ $s }}</span>
+                                    @endforeach
+                                </div>
+                            @endif>
                         </div>
-                    </div>
+                    @empty
+                        <p class="py-6 opacity-70">No jobs found.</p>
+                    @endforelse
                 </div>
-            </a>
-        @empty
-            <div class="bg-white rounded-xl shadow p-6 text-gray-600">
-                No jobs found. Try changing your filters.
-            </div>
-        @endforelse
 
-        <div class="mt-6">
-            {{ $jobs->links() }}
+                <div class="mt-4">{{ $jobs->links() }}</div>
+            </div>
         </div>
     </div>
 </x-app-layout>

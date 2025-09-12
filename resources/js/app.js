@@ -2,6 +2,8 @@
 import './bootstrap';
 
 import './gmaps-autocomplete';
+import './reports'
+import 'flowbite';
 
 // (Optional) ensure Google’s PAC dropdown isn’t hidden behind modals/nav
 const style = document.createElement('style');
