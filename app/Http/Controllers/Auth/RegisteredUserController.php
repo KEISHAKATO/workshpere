@@ -46,6 +46,8 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+        return redirect()->route('verification.notice');
+
 
         // Send them to the role-specific editor first; else go to dashboard
         if ($user->isEmployer() || $user->isAdmin()) {

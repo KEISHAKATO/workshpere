@@ -3,7 +3,7 @@
         <div class="card-body">
             <h1 class="card-title justify-center">Reset password</h1>
 
-            <form method="POST" action="{{ route('password.update') }}" class="mt-2 space-y-4">
+            <form method="POST" action="{{ route('password.store') }}" class="mt-2 space-y-4">
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
@@ -15,7 +15,7 @@
 
                 <div>
                     <label class="label"><span class="label-text">New password</span></label>
-                    <input id="password" type="password" name="password" class="input input-bordered w-full" required autofocus>
+                    <input id="password" type="password" name="password" class="input input-bordered w-full" required>
                     <x-input-error :messages="$errors->get('password')" class="mt-1" />
                 </div>
 
@@ -26,6 +26,7 @@
 
                 <button class="btn btn-primary w-full mt-2">Update password</button>
             </form>
+
         </div>
     </div>
 </x-guest-layout>

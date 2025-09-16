@@ -75,7 +75,7 @@ Route::get('/dashboard', DashboardController::class)
 /*
 | Redirect generic /profile -> role-specific editor
 */
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', function () {
         $u = auth()->user();
         if (method_exists($u, 'isEmployer') && ($u->isEmployer() || $u->isAdmin())) {
@@ -88,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
 /*
 | Authenticated areas
 */
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     | Employer
