@@ -12,7 +12,6 @@ class ReviewController extends Controller
     {
         $user = $request->user();
 
-        // Ensure current user is part of this application (seeker or the job’s employer)
         $isSeekerParticipant   = $application->seeker_id === $user->id;
         $isEmployerParticipant = optional($application->job)->employer_id === $user->id;
 
@@ -20,26 +19,23 @@ class ReviewController extends Controller
             abort(403, 'Not allowed to review this application.');
         }
 
-        // Only allow after completion (prefer "completed" else fallback to "accepted")
         $status = (string) $application->status;
-        $allowed = in_array($status, ['completed', 'accepted'], true);
-        if (!$allowed) {
+        if (!in_array($status, ['completed', 'accepted'], true)) {
             return back()->withErrors([
                 'review' => 'Reviews can only be left after the job is accepted/completed.'
             ]);
         }
 
         $data = $request->validate([
-            'rating'  => ['required','integer','min:1','max:5'],
-            'title'   => ['nullable','string','max:120'],
-            'comment' => ['nullable','string','max:2000'],
+            'rating'   => ['required','integer','min:1','max:5'],
+            'feedback' => ['nullable','string','max:2000'],
         ]);
 
-        $reviewerRole = $isEmployerParticipant ? 'employer' : 'seeker';
-        $revieweeId   = $isEmployerParticipant ? $application->seeker_id : optional($application->job)->employer_id;
+        $revieweeId = $isEmployerParticipant
+            ? $application->seeker_id
+            : optional($application->job)->employer_id;
 
-        // Guard against duplicate
-        $exists = Review::where('application_id', $application->id)
+        $exists = Review::where('job_id', $application->job_id)
             ->where('reviewer_id', $user->id)
             ->exists();
 
@@ -50,13 +46,11 @@ class ReviewController extends Controller
         }
 
         Review::create([
-            'application_id' => $application->id,
-            'reviewer_id'    => $user->id,
-            'reviewee_id'    => $revieweeId,
-            'reviewer_role'  => $reviewerRole,
-            'rating'         => $data['rating'],
-            'title'          => $data['title'] ?? null,
-            'comment'        => $data['comment'] ?? null,
+            'job_id'      => $application->job_id,
+            'reviewer_id' => $user->id,
+            'reviewee_id' => $revieweeId,
+            'rating'      => $data['rating'],
+            'feedback'    => $data['feedback'] ?? null,
         ]);
 
         return back()->with('status', 'Thanks! Your review has been submitted.');

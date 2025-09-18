@@ -4,7 +4,7 @@
 ])
 
 @php
-    $alreadyReviewed = \App\Models\Review::where('application_id', $application->id)
+    $alreadyReviewed = \App\Models\Review::where('job_id', $application->job_id)
         ->where('reviewer_id', $user->id)
         ->exists();
 
@@ -16,8 +16,6 @@
 @endphp
 
 <div class="mt-6">
-
-
     @if($errors->has('review'))
         <div class="mb-3 rounded bg-red-50 text-red-800 px-3 py-2 text-sm">
             {{ $errors->first('review') }}
@@ -40,17 +38,10 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium mb-1" for="title">Title (optional)</label>
-                <input id="title" name="title" class="w-full border rounded p-2" maxlength="120"
-                       placeholder="Great experience, would hire again">
-                @error('title') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1" for="comment">Comment (optional)</label>
-                <textarea id="comment" name="comment" class="w-full border rounded p-2" rows="4"
+                <label class="block text-sm font-medium mb-1" for="feedback">Feedback (optional)</label>
+                <textarea id="feedback" name="feedback" class="w-full border rounded p-2" rows="4"
                           placeholder="Add any details that may help others trust this user."></textarea>
-                @error('comment') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+                @error('feedback') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
             </div>
 
             <button class="bg-blue-600 text-white px-4 py-2 rounded">

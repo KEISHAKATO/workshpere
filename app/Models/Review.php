@@ -10,18 +10,16 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
-        'application_id',
+        'job_id',
         'reviewer_id',
         'reviewee_id',
-        'reviewer_role',
         'rating',
-        'title',
-        'comment',
+        'feedback',
     ];
 
-    public function application()
+    public function job()
     {
-        return $this->belongsTo(Application::class);
+        return $this->belongsTo(Job::class, 'job_id');
     }
 
     public function reviewer()

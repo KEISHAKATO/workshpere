@@ -77,7 +77,7 @@ class RelationshipTestSeeder extends Seeder
                 'job_id'     => $job->id,
                 'sender_id'  => $employer->id,
                 'receiver_id'=> $seeker->id,
-                'content'    => 'Can you start next week?',
+                'body'    => 'Can you start next week?',
             ],
             [] // no extra fields to update
         );

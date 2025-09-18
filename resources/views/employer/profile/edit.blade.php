@@ -3,14 +3,14 @@
         <h2 class="font-semibold text-xl">Company Profile (Employer)</h2>
     </x-slot>
 
+
     <div class="max-w-3xl mx-auto p-4">
-
-
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <form method="POST" action="{{ route('employer.profile.update') }}" class="grid grid-cols-1 gap-5">
                     @csrf
                     @method('PATCH')
+
 
                     {{-- Company name --}}
                     <div class="form-control">
@@ -20,6 +20,7 @@
                         <x-input-error :messages="$errors->get('company_name')" class="mt-1" />
                     </div>
 
+
                     {{-- Website --}}
                     <div class="form-control">
                         <label class="label"><span class="label-text">Website</span></label>
@@ -28,6 +29,7 @@
                         <x-input-error :messages="$errors->get('website')" class="mt-1" />
                     </div>
 
+
                     {{-- About --}}
                     <div class="form-control">
                         <label class="label"><span class="label-text">About</span></label>
@@ -35,6 +37,7 @@
                                   placeholder="Describe your company and the kind of talent you hire.">{{ old('about', $profile->about) }}</textarea>
                         <x-input-error :messages="$errors->get('about')" class="mt-1" />
                     </div>
+
 
                     {{-- Location (single search field) --}}
                     <div class="form-control">
@@ -51,11 +54,13 @@
                         <label class="label"><span class="label-text-alt">Pick a suggestion to save City/County and coordinates.</span></label>
                     </div>
 
+
                     {{-- Hidden fields populated by autocomplete --}}
                     <input type="hidden" name="location_city"   value="{{ old('location_city', $profile->location_city) }}">
                     <input type="hidden" name="location_county" value="{{ old('location_county', $profile->location_county) }}">
                     <input type="hidden" name="lat"             value="{{ old('lat', $profile->lat) }}">
                     <input type="hidden" name="lng"             value="{{ old('lng', $profile->lng) }}">
+
 
                     {{-- Saved Location (summary) --}}
                     @php
@@ -77,10 +82,12 @@
                         </div>
                     </div>
 
+
                     <div class="form-control">
                         <button class="btn btn-primary">Save</button>
                     </div>
                 </form>
+
 
                 {{-- Reviews & Ratings --}}
                 <div class="divider my-6">Reviews</div>
@@ -88,6 +95,7 @@
                     $full = (int) floor($avgRating ?? 0);
                     $empty = 5 - $full;
                 @endphp
+
 
                 <div class="flex items-center gap-3 mb-3">
                     <div class="rating rating-sm">
@@ -103,6 +111,7 @@
                     </div>
                 </div>
 
+
                 @forelse($reviews as $rev)
                     @php
                         $rFull = (int) $rev->rating;
@@ -110,15 +119,21 @@
                     @endphp
                     <div class="bg-base-200 rounded-xl p-4 mb-3">
                         <div class="flex items-center justify-between">
-                            <div class="font-medium">{{ $rev->title ?: 'Review' }}</div>
+                            <div class="font-medium">Review</div>
                             <div class="rating rating-xs">
                                 {!! str_repeat('<input type="radio" class="mask mask-star-2 bg-amber-400" checked />', $rFull) !!}
                                 {!! str_repeat('<input type="radio" class="mask mask-star-2" />', $rEmpty) !!}
                             </div>
                         </div>
-                        @if($rev->comment)
-                            <p class="mt-2">{{ $rev->comment }}</p>
+
+
+                        @if(!empty($rev->feedback))
+                            <p class="mt-2">{{ $rev->feedback }}</p>
+                        @else
+                            <p class="mt-2 opacity-70"><em>No feedback text provided.</em></p>
                         @endif
+
+
                         <div class="mt-2 text-xs opacity-70">
                             by {{ $rev->reviewer->name ?? '—' }} • {{ optional($rev->created_at)->diffForHumans() }}
                         </div>
@@ -126,6 +141,7 @@
                 @empty
                     <p class="opacity-70">No reviews yet.</p>
                 @endforelse
+
 
                 @if($reviews->hasPages())
                     <div class="mt-2">{{ $reviews->links() }}</div>
