@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Safe-area + consistent page padding on mobile */
+@layer utilities {
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Tighten DaisyUI stats on very small screens so they never overlap */
+@media (max-width: 400px) {
+  .stat { padding: 0.5rem !important; }
+  .stat .stat-title { font-size: 0.7rem !important; }
+  .stat .stat-value { font-size: 1.125rem !important; } /* ~18px */
+}
+
+/* Prevent accidental horizontal scroll from wide components */
+html, body { overflow-x: hidden; }
+

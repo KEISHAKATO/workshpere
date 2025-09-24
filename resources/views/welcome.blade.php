@@ -10,16 +10,15 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
-<body class="antialiased bg-base-100 text-base-content">
+<body class="antialiased bg-base-100 text-base-content overflow-x-hidden">
     {{-- Top nav --}}
     <header class="sticky top-0 z-30 bg-base-100/90 backdrop-blur border-b border-base-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-2">
-                <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-48 w-48">
-                <!-- <span class="font-semibold">Worksphere</span> -->
+        <div class="max-w-7xl mx-auto px-safe py-2 h-14 sm:h-16 flex items-center justify-between">
+            <a href="{{ url('/') }}" class="flex items-center gap-2 min-w-0">
+                <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-32 sm:h-32 w-auto shrink-0">
             </a>
 
-            <nav class="flex items-center gap-2">
+            <nav class="hidden sm:flex items-center gap-1">
                 <a href="#features" class="btn btn-ghost btn-sm">Features</a>
                 <a href="#why" class="btn btn-ghost btn-sm">Why Worksphere</a>
                 <a href="#footer" class="btn btn-ghost btn-sm">Contact</a>
@@ -31,25 +30,34 @@
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Get started</a>
                 @endif
             </nav>
+
+            {{-- Simple mobile action (keeps header compact) --}}
+            <div class="sm:hidden">
+                @if($isAuthed)
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-xs">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-ghost btn-xs">Sign in</a>
+                @endif
+            </div>
         </div>
     </header>
 
-    {{-- Hero --}
     {{-- Hero --}}
-<section class="relative overflow-hidden bg-cover bg-center" style="background-image: url('https://ik.imagekit.io/xqjcglzri/workshpere-hero.png?updatedAt=1757700544438');">
-    <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div class="grid lg:grid-cols-2 gap-10 items-center">
+    <section class="relative overflow-hidden bg-cover bg-center pb-24 sm:pb-28" style="background-image: url('https://ik.imagekit.io/xqjcglzri/workshpere-hero.png?updatedAt=1757700544438');">
+        <div class="absolute inset-0 bg-gradient-to-b from-base-100/70 via-base-100/40 to-base-100/80"></div>
+        <div class="relative max-w-7xl mx-auto px-safe py-10 sm:py-16">
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                {{-- Left: copy --}}
                 <div>
-                    <h1 class="text-4xl sm:text-5xl font-bold leading-tight">
+                    <h1 class="text-3xl sm:text-5xl font-bold leading-tight">
                         Worksphere - hire locally, <span class="text-primary">faster</span>.
                     </h1>
-                    <p class="mt-5 text-lg opacity-80">
+                    <p class="mt-4 text-base sm:text-lg opacity-80 max-w-prose">
                         Post roles, discover skilled workers, and manage applications in one simple workspace.
                         Built for counties, SMEs, and pros.
                     </p>
 
-                    <div class="mt-8 flex flex-wrap gap-3">
+                    <div class="mt-6 sm:mt-8 flex flex-wrap gap-3">
                         @if($isAuthed)
                             <a href="{{ route('dashboard') }}" class="btn btn-primary">
                                 <svg xmlns="http://www.w3.org/1000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm4 0h14v-2H7v2z"/></svg>
@@ -67,45 +75,46 @@
                         @endif
                     </div>
 
-                    {{-- Stats --}}
-                    <div class="mt-10 grid grid-cols-3 gap-4 text-center sm:max-w-md">
-                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box">
-                            <div class="stat-title">Jobs Posted</div>
-                            <div class="stat-value text-primary">1,240</div>
+                    {{-- Stats (non-overlapping, compact on phones) --}}
+                    <div class="mt-8 sm:mt-10 grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-xs sm:max-w-md">
+                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box p-2 sm:p-3">
+                            <div class="stat-title text-xs sm:text-sm">Jobs Posted</div>
+                            <div class="stat-value text-primary text-xl sm:text-3xl">1,240</div>
                         </div>
-                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box">
-                            <div class="stat-title">Applicants</div>
-                            <div class="stat-value">3,580</div>
+                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box p-2 sm:p-3">
+                            <div class="stat-title text-xs sm:text-sm">Applicants</div>
+                            <div class="stat-value text-xl sm:text-3xl">3,580</div>
                         </div>
-                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box">
-                            <div class="stat-title">Avg. Match</div>
-                            <div class="stat-value">83%</div>
+                        <div class="stat place-items-center bg-base-100 shadow-sm rounded-box p-2 sm:p-3">
+                            <div class="stat-title text-xs sm:text-sm">Avg. Match</div>
+                            <div class="stat-value text-xl sm:text-3xl">83%</div>
                         </div>
                     </div>
                 </div>
 
+                {{-- Right: mock window --}}
                 <div class="relative">
-                    <div class="mockup-window border bg-base-100 shadow-xl">
-                        <div class="p-6">
+                    <div class="mockup-window border bg-base-100 shadow-xl overflow-hidden rounded-2xl">
+                        <div class="p-4 sm:p-6">
                             @if(isset($latestJobs) && $latestJobs->count())
-                                <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center justify-between mb-3 sm:mb-4">
                                     <div class="font-semibold">Latest roles</div>
                                     <a href="{{ route('public.jobs.index') }}" class="link link-primary text-sm">Browse all</a>
                                 </div>
 
-                                <div class="grid sm:grid-cols-2 gap-4">
+                                <div class="grid gap-3 sm:grid-cols-2">
                                     @foreach($latestJobs as $j)
                                         <a href="{{ route('public.jobs.show', $j) }}" class="card bg-base-100 border border-base-300 hover:shadow-md transition">
-                                            <div class="card-body p-4">
+                                            <div class="card-body p-3 sm:p-4">
                                                 <div class="flex items-start justify-between gap-2">
-                                                    <h4 class="font-semibold line-clamp-2">{{ $j->title }}</h4>
-                                                    <span class="badge badge-soft">{{ ucfirst(str_replace('_',' ', $j->job_type)) }}</span>
+                                                    <h4 class="font-semibold text-sm sm:text-base line-clamp-2">{{ $j->title }}</h4>
+                                                    <span class="badge badge-soft shrink-0">{{ ucfirst(str_replace('_',' ', $j->job_type)) }}</span>
                                                 </div>
-                                                <div class="text-sm opacity-80 mt-1">
-                                                    {{ $j->location_city ?? '—' }}, {{ $j->location_county ?? '—' }}
+                                                <div class="text-xs sm:text-sm opacity-80 mt-1">
+                                                    {{ $j->location_city ?? '-' }}, {{ $j->location_county ?? '-' }}
                                                 </div>
                                                 @if(is_array($j->required_skills) && count($j->required_skills))
-                                                    <div class="mt-3 flex flex-wrap gap-2">
+                                                    <div class="mt-2 sm:mt-3 flex flex-wrap gap-2">
                                                         @foreach(array_slice($j->required_skills, 0, 3) as $s)
                                                             <span class="badge badge-ghost">{{ $s }}</span>
                                                         @endforeach
@@ -114,17 +123,16 @@
                                                         @endif
                                                     </div>
                                                 @endif
-                                                <div class="mt-3 text-sm font-medium">
+                                                <div class="mt-2 sm:mt-3 text-sm font-medium">
                                                     {{ $j->currency ?? 'KES' }}
-                                                    {{ $j->pay_min ? number_format($j->pay_min) : '—' }}
-                                                    – {{ $j->pay_max ? number_format($j->pay_max) : '—' }}
+                                                    {{ $j->pay_min ? number_format($j->pay_min) : '-' }}
+                                                    – {{ $j->pay_max ? number_format($j->pay_max) : '-' }}
                                                 </div>
                                             </div>
                                         </a>
                                     @endforeach
                                 </div>
                             @else
-                                {{-- Fallback: show skeletons if there are no jobs to showcase yet --}}
                                 <div class="skeleton h-4 w-32 mb-4"></div>
                                 <div class="skeleton h-4 w-full mb-2"></div>
                                 <div class="skeleton h-4 w-2/3"></div>
@@ -136,7 +144,8 @@
                         </div>
                     </div>
 
-                    <div class="absolute -bottom-10 -left-0 hidden sm:block">
+                    {{-- badge only on ≥sm to avoid overlay on phones --}}
+                    <div class="absolute -bottom-8 left-2 hidden sm:block">
                         <div class="badge badge-primary badge-lg shadow">AI-assisted matches</div>
                     </div>
                 </div>
@@ -145,10 +154,10 @@
     </section>
 
     {{-- Features --}}
-    <section id="features" class="py-12 sm:py-16 bg-base-100 border-t border-base-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="features" class="py-10 sm:py-16 bg-base-100 border-t border-base-300">
+        <div class="max-w-7xl mx-auto px-safe">
             <h2 class="text-2xl sm:text-3xl font-bold">Everything you need to hire & get hired</h2>
-            <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="mt-6 sm:mt-8 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach([
                     ['icon'=>'briefcase','title'=>'Simple job posting','text'=>'Create polished listings with location, skills, and pay ranges.'],
                     ['icon'=>'users','title'=>'Smart recommendations','text'=>'We surface relevant seekers for each role and jobs for seekers.'],
@@ -172,13 +181,13 @@
     </section>
 
     {{-- CTA --}}
-    <section id="why" class="py-16">
-        <div class="max-w-3xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold">Hire better in days, not weeks</h2>
+    <section id="why" class="py-14 sm:py-16">
+        <div class="max-w-3xl mx-auto px-safe text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold">Hire better in days, not weeks</h2>
             <p class="mt-3 opacity-80">
                 Whether you're an SME, county HR, or a skilled pro - Worksphere helps you connect and close quickly.
             </p>
-            <div class="mt-8 flex justify-center gap-3">
+            <div class="mt-6 sm:mt-8 flex justify-center gap-3">
                 <a href="{{ route('register') }}" class="btn btn-primary btn-wide">Create free account</a>
                 <a href="{{ route('public.jobs.index') }}" class="btn btn-ghost">Browse jobs</a>
             </div>
@@ -187,16 +196,14 @@
 
     {{-- Footer --}}
     <footer id="footer" class="border-t border-base-300 bg-base-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-safe py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <a href="{{ url('/') }}" class="flex items-center gap-2">
-                    <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-32 w-32">
-                    <!-- <span class="font-semibold">Worksphere</span> -->
+                    <img src="{{ asset('workshpere-logo.png') }}" alt="Worksphere Logo" class="h-32 w-auto sm:h-32">
                 </a>
-                
-                <span class="opacity-70">© {{ date('Y') }}</span>
+                <span class="opacity-70 text-sm">© {{ date('Y') }}</span>
             </div>
-            <div class="flex gap-4 text-sm">
+            <div class="flex gap-4 text-xs sm:text-sm">
                 <a href="{{ route('public.jobs.index') }}" class="link link-hover">Jobs</a>
                 <a href="{{ route('login') }}" class="link link-hover">Sign in</a>
                 <a href="{{ route('register') }}" class="link link-hover">Create account</a>

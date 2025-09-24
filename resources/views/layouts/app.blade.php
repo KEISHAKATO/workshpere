@@ -59,8 +59,9 @@
             </main>
 
             {{-- Chatbot --}}
-            @include('partials.chatbot')
+            
         </div>
+        
 
         {{-- Sidebar --}}
         <div class="drawer-side z-40">
@@ -76,7 +77,7 @@
             </aside>
         </div>
     </div>
-
+    @include('partials.chatbot')
     @stack('modals')
     @stack('scripts')
 </body>

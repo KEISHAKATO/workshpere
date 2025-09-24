@@ -25,5 +25,7 @@
                 {{ $slot }}
             </div>
         </div>
+        @include('partials.chatbot')
+
     </body>
 </html>
