@@ -40,3 +40,7 @@ __pycache__/
 dist/
 build/
 ml/.venv/
+/vendor/
+/node_modules/
+/storage/*
+!/storage/.gitignore

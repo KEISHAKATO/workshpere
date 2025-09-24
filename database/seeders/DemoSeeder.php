@@ -23,7 +23,12 @@ class DemoSeeder extends Seeder
             $email = "employer{$i}@worksphere.test";
             $user = User::firstOrCreate(
                 ['email' => $email],
-                ['name' => "Employer {$i}", 'password' => Hash::make('password')]
+                [
+                    'name'              => "Employer {$i}",
+                    'password'          => Hash::make('password'),
+                    'role'              => 'employer',
+                    'email_verified_at' => now(),
+                ]
             );
             if ($user->role !== 'employer') { $user->role = 'employer'; $user->save(); }
 
@@ -41,7 +46,12 @@ class DemoSeeder extends Seeder
             $email = "seeker{$i}@worksphere.test";
             $user = User::firstOrCreate(
                 ['email' => $email],
-                ['name' => "Seeker {$i}", 'password' => Hash::make('password')]
+                [
+                    'name'              => "Seeker {$i}",
+                    'password'          => Hash::make('password'),
+                    'role'              => 'seeker',
+                    'email_verified_at' => now(),
+                ]
             );
             if ($user->role !== 'seeker') { $user->role = 'seeker'; $user->save(); }
 
@@ -64,7 +74,7 @@ class DemoSeeder extends Seeder
                 });
         }
 
-        // Applications (NO cover_note)
+        // Applications
         foreach ($jobs as $job) {
             $applicants = $seekers->shuffle()->take(rand(3, 5));
             foreach ($applicants as $seeker) {
@@ -75,7 +85,7 @@ class DemoSeeder extends Seeder
             }
         }
 
-        // Messages (uses 'body' per your Message model)
+        // Messages (uses 'body')
         foreach (Application::inRandomOrder()->take(20)->get() as $app) {
             Message::updateOrCreate(
                 [
@@ -89,7 +99,7 @@ class DemoSeeder extends Seeder
             );
         }
 
-        // Reviews (run only if model exists & schema matches)
+        // Reviews (schema: job_id, reviewer_id, reviewee_id, rating, feedback)
         if (class_exists(Review::class)) {
             $jobsForReview = Job::inRandomOrder()->take(10)->get();
             foreach ($jobsForReview as $job) {
@@ -104,8 +114,7 @@ class DemoSeeder extends Seeder
                     [
                         'reviewee_id' => $application->seeker_id,
                         'rating'      => rand(3, 5),
-                        'title'       => 'Great Work!',
-                        'comment'     => $faker->sentence(),
+                        'feedback'    => 'Great work! ' . $faker->sentence(),
                     ]
                 );
             }
