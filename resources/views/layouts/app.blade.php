@@ -77,7 +77,8 @@
             </aside>
         </div>
     </div>
-    @include('partials.chatbot')
+    @include('partials.support-button')
+
     @stack('modals')
     @stack('scripts')
 </body>

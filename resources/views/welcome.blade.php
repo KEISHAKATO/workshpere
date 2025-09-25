@@ -210,6 +210,7 @@
             </div>
         </div>
     </footer>
-    @include('partials.chatbot')
+    @include('partials.support-button')
+
 </body>
 </html>

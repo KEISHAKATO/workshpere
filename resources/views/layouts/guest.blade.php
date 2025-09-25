@@ -25,7 +25,8 @@
                 {{ $slot }}
             </div>
         </div>
-        @include('partials.chatbot')
+        @include('partials.support-button')
+
 
     </body>
 </html>

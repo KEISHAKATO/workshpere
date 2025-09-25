@@ -44,6 +44,8 @@ use App\Http\Controllers\ReviewController;
 /*
 | Public
 */
+Route::view('/support-chat', 'chat.support')->name('support.chat');
+Route::get('/support/chat', fn () => view('chat.support'))->name('support.chat');
 Route::get('/', function () {
     $latestJobs = Job::where('status', 'open')
         ->orderByDesc('posted_at')
