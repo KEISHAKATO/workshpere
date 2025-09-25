@@ -1,95 +1,149 @@
 @if (app()->environment('local') || app()->environment('development') || app()->environment('production'))
-  <style>
-    /* Launcher (blue round button) */
-    #botmanWidgetRoot .botmanWidget--launcher{
-      position:fixed !important;
+<style>
+  /* ===== Launcher (blue round button) ===== */
+  #botmanWidgetRoot .botmanWidget--launcher{
+    position:fixed !important;
+    right:max(16px, env(safe-area-inset-right)) !important;
+    bottom:max(16px, env(safe-area-inset-bottom)) !important;
+    left:auto !important; top:auto !important;
+    width:64px !important; height:64px !important;
+    border-radius:9999px !important;
+    display:flex !important; align-items:center !important; justify-content:center !important;
+    padding:0 !important; margin:0 !important; transform:none !important;
+    background:#2563eb !important;
+    box-shadow:0 10px 24px rgba(0,0,0,.25) !important;
+    z-index:2147483000 !important;
+  }
+  /* Always show the same envelope icon (hide whatever the widget injects) */
+  #botmanWidgetRoot .botmanWidget--launcher svg { display:none !important; }
+  #botmanWidgetRoot .botmanWidget--launcher::before{
+    content:"";
+    display:block;
+    width:28px; height:28px;
+    margin:18px auto;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:contain;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM4 8l8 5 8-5v10H4V8zm16-2l-8 5-8-5V6h16z'/></svg>");
+  }
+
+  /* ===== The outer container Botman toggles (the cause of “can’t click behind it”) ===== */
+  /* When hidden: make it non-interactive and size 0 so it can’t block taps */
+  #webchat{
+    position:fixed !important;
+    right:max(16px, env(safe-area-inset-right)) !important;
+    bottom:max(16px, env(safe-area-inset-bottom)) !important;
+    left:auto !important; top:auto !important;
+    display:none !important;
+    width:0 !important; height:0 !important;
+    pointer-events:none !important;     /* <-- key fix */
+    z-index:2147483001 !important;
+    transform:none !important; margin:0 !important; border:0 !important; overflow:hidden !important;
+  }
+  /* When shown: restore size & interactivity, docked to bottom-right */
+  #webchat.opened,
+  #webchat[style*="display: block"]{
+    display:block !important;
+    pointer-events:auto !important;
+    width:min(420px, 100vw) !important;
+    height:72vh !important; max-height:72vh !important;
+    right:max(16px, env(safe-area-inset-right)) !important;
+    bottom:max(16px, env(safe-area-inset-bottom)) !important;
+    left:auto !important; top:auto !important;
+    border-radius:12px 12px 0 0 !important;
+    transform:none !important; overflow:hidden !important;
+  }
+  /* Mobile: full-width bottom sheet centered between safe-area insets */
+  @media (max-width:640px){
+    #webchat.opened,
+    #webchat[style*="display: block"]{
+      left:max(16px, env(safe-area-inset-left)) !important;
       right:max(16px, env(safe-area-inset-right)) !important;
-      bottom:max(16px, env(safe-area-inset-bottom)) !important;
-      width:64px !important; height:64px !important;
-      border-radius:9999px !important;
-      background:#2563eb !important;
-      box-shadow:0 10px 24px rgba(0,0,0,.25) !important;
-      z-index:2147483000 !important;
-      display:flex !important; align-items:center !important; justify-content:center !important;
+      width:auto !important;
     }
-    /* Panel (opens from bottom, like a sheet) */
-    #botmanWidgetRoot .botmanWidget{
-      position:fixed !important;
-      bottom:0 !important; top:auto !important;
-      right:0 !important; left:auto !important;
-      width:min(420px,100vw) !important;
-      max-height:72vh !important;
-      transform:none !important;
-      border-radius:12px 12px 0 0 !important;
-      overflow:hidden !important;
-      z-index:2147483001 !important;
-    }
-    @media (max-width:640px){
-      #botmanWidgetRoot .botmanWidget{ width:100vw !important; left:0 !important; right:0 !important; }
-    }
-  </style>
+  }
+  /* The iframe should fill the panel exactly */
+  #webchat iframe{ display:block !important; width:100% !important; height:100% !important; border:0 !important; }
 
-  <script>
-    (function () {
-      const ENVELOPE =
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='white'><path d='M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM4 8l8 5 8-5v10H4V8zm16-2l-8 5-8-5V6h16z'/></svg>";
+  /* Close button inside the panel */
+  #botmanWidgetRoot .botman-close-button{ right:8px !important; top:8px !important; }
+</style>
 
-      function apply() {
-        const root = document.getElementById('botmanWidgetRoot');
-        if (!root) return;
+<script>
+  (function () {
+    // Botman config (colors still used inside the iframe)
+    window.botmanWidget = {
+      title: 'Worksphere Assistant',
+      introMessage: '👋 Hi! I can help with navigation, FAQs and job/apply steps.',
+      aboutText: 'Worksphere Support',
+      bubbleBackground: '#2563eb',
+      mainColor: '#2563eb',
+      placeholderText: 'Type a message…',
+      chatServer: @json(route('botman.handle')),
+      desktopWidth: 360,
+      desktopHeight: 520,
+      mobileHeight: 460
+    };
 
-        // Ensure the widget root is a direct child of <body> (prevents clipping by drawers/containers)
-        if (root.parentElement !== document.body) {
-          document.body.appendChild(root);
+    // Keep positions consistent and ensure hidden state never blocks taps
+    const reapply = () => {
+      const root = document.getElementById('botmanWidgetRoot');
+      if (!root) return;
+
+      // Ensure not clipped by any parent (drawers, overflow etc.)
+      if (root.parentElement !== document.body) document.body.appendChild(root);
+
+      const launcher = root.querySelector('.botmanWidget--launcher');
+      if (launcher) {
+        // Ensure envelope icon remains (in case widget swaps it)
+        if (!launcher.querySelector('svg')) {
+          launcher.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='white'><path d='M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM4 8l8 5 8-5v10H4V8zm16-2l-8 5-8-5V6h16z'/></svg>";
         }
-
-        // Fix launcher (bubble) + lock icon
-        const launcher = root.querySelector('.botmanWidget--launcher');
-        if (launcher) {
-          launcher.innerHTML = ENVELOPE;
-          const svg = launcher.querySelector('svg');
-          if (svg) svg.style.cssText = 'display:block;margin:0;';
-          Object.assign(launcher.style, {
-            position:'fixed', right:'16px', bottom:'16px',
-            width:'64px', height:'64px', borderRadius:'9999px',
-            background:'#2563eb', boxShadow:'0 10px 24px rgba(0,0,0,.25)',
-            zIndex:'2147483000', display:'flex', alignItems:'center', justifyContent:'center'
-          });
-        }
-
-        // Fix panel (bottom sheet)
-        const panel = root.querySelector('.botmanWidget');
-        if (panel) {
-          Object.assign(panel.style, {
-            position:'fixed', bottom:'0', top:'auto', right:'0', left:'auto',
-            width:'min(420px,100vw)', maxHeight:'72vh', transform:'none',
-            borderRadius:'12px 12px 0 0', overflow:'hidden', zIndex:'2147483001'
-          });
-        }
+        Object.assign(launcher.style, {
+          position:'fixed', right:'16px', bottom:'16px', left:'auto', top:'auto',
+          width:'64px', height:'64px', borderRadius:'9999px',
+          background:'#2563eb', boxShadow:'0 10px 24px rgba(0,0,0,.25)',
+          zIndex:'2147483000', display:'flex', alignItems:'center', justifyContent:'center'
+        });
       }
 
-      // Re-apply whenever the widget injects/updates DOM
-      new MutationObserver(apply).observe(document.documentElement, { childList:true, subtree:true });
-      window.addEventListener('resize', apply);
-      window.addEventListener('orientationchange', apply);
-      document.addEventListener('DOMContentLoaded', apply);
+      const wc = document.getElementById('webchat');
+      if (wc) {
+        // If closed/hidden, guarantee it cannot intercept touches
+        const isOpen = wc.classList.contains('opened') || (wc.style.display && wc.style.display !== 'none');
+        if (!isOpen) {
+          wc.style.pointerEvents = 'none';
+          wc.style.width = '0';
+          wc.style.height = '0';
+          wc.style.display = 'none';
+          wc.style.right = '16px';
+          wc.style.bottom = '16px';
+          wc.style.left = 'auto';
+          wc.style.top = 'auto';
+        } else {
+          // When opened: enforce bottom-sheet geometry
+          wc.style.pointerEvents = 'auto';
+          wc.style.display = 'block';
+          wc.style.width = 'min(420px, 100vw)';
+          wc.style.height = '72vh';
+          wc.style.right = '16px';
+          wc.style.bottom = '16px';
+          wc.style.left = 'auto';
+          wc.style.top = 'auto';
+          wc.style.borderRadius = '12px 12px 0 0';
+          wc.style.overflow = 'hidden';
+          wc.style.zIndex = '2147483001';
+        }
+      }
+    };
 
-      // Botman config
-      window.botmanWidget = {
-        title: 'Worksphere Assistant',
-        introMessage: '👋 Hi! I can help with navigation, FAQs and job/apply steps.',
-        aboutText: 'Worksphere Support',
-        bubbleBackground: '#2563eb',
-        mainColor: '#2563eb',
-        placeholderText: 'Type a message…',
-        chatServer: @json(route('botman.handle')),
-        desktopWidth: 360,
-        desktopHeight: 520,
-        mobileHeight: 460
-      };
-    })();
-  </script>
+    // Re-apply on load and whenever Botman mutates the DOM
+    window.addEventListener('load', reapply);
+    window.addEventListener('resize', reapply);
+    window.addEventListener('orientationchange', reapply);
+    new MutationObserver(reapply).observe(document.documentElement, {subtree:true, childList:true, attributes:true});
+  })();
+</script>
 
-  <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js?v=4" defer></script>
-
+<script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js" defer></script>
 @endif
