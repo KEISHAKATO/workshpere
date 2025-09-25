@@ -81,8 +81,6 @@ main: release
 develop: integration
 feature/*: per feature
 
-## Today
-- Breeze auth installed
-- DB connected and migrated
+
 
 
