@@ -7,15 +7,17 @@
   </x-slot>
 
   <div class="py-6">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="max-w-7xl mx-auto px-safe sm:px-6 lg:px-8 space-y-8">
       @php
         $userCount = \App\Models\User::count();
         $jobCount  = \App\Models\Job::count();
         $appCount  = \App\Models\Application::count();
       @endphp
 
-      <section class="bg-base-100 shadow rounded-xl p-6">
+      <section class="bg-base-100 shadow rounded-xl p-6 pb-8">
         <h3 class="text-lg font-semibold mb-4">Admin Overview</h3>
+
+        {{-- Stats --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="stat bg-base-200 rounded-xl">
             <div class="stat-title">Users</div>
@@ -31,11 +33,27 @@
           </div>
         </div>
 
-        <div class="mt-5 flex gap-3">
-          <a href="{{ route('admin.users.index') }}" class="btn">Manage Users</a>
-          <a href="{{ route('admin.jobs.index') }}" class="btn">Manage Jobs</a>
-          <a href="{{ route('admin.applications.index') }}" class="btn">Manage Applications</a>
-          <a href="{{ route('admin.reports.index') }}" class="btn btn-primary">Reports</a>
+        {{-- Actions (mobile-safe, wraps nicely) --}}
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href="{{ route('admin.users.index') }}"
+             class="btn btn-outline w-full sm:w-auto">
+            Manage Users
+          </a>
+
+          <a href="{{ route('admin.jobs.index') }}"
+             class="btn btn-outline w-full sm:w-auto">
+            Manage Jobs
+          </a>
+
+          <a href="{{ route('admin.applications.index') }}"
+             class="btn btn-outline w-full sm:w-auto">
+            Manage Applications
+          </a>
+
+          <a href="{{ route('admin.reports.index') }}"
+             class="btn btn-primary w-full sm:w-auto">
+            Reports
+          </a>
         </div>
       </section>
     </div>
